@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lũy thừa với số mũ tự nhiên - Trình Chiếu</title>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #eccfa0; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .slide-container { width: 95vw; height: 95vh; height: 95dvh; background: #fff; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; position: relative; padding: 10px; box-sizing: border-box; }
+        .slide-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-bottom: 20px; flex-shrink: 0; }
+        .slide-header h2 { margin: 0; color: #0056b3; font-size: var(--fs-title); }
+        
+        /* --- CỠ CHỮ CO GIÃN THEO MÀN HÌNH ---
+           --u kết hợp chiều rộng và chiều cao nên màn hình dọc (điện thoại) và ngang đều vừa mắt;
+           clamp() chặn nhỏ nhất để dễ đọc trên điện thoại, chặn lớn nhất để không phình trên màn hình lớn. */
+        :root {
+            --u: calc(0.65vw + 0.65vh);
+            --fs-title: clamp(16px, calc(var(--u) * 1.8), 34px);
+            --fs-q: clamp(16px, calc(var(--u) * 2), 40px);
+            --fs-q-sm: clamp(15px, calc(var(--u) * 1.6), 34px);
+            --fs-sol: clamp(15px, calc(var(--u) * 1.8), 36px);
+            --fs-opt: clamp(14px, calc(var(--u) * 1.6), 32px);
+            --fs-btn: clamp(13px, calc(var(--u) * 1.25), 22px);
+            --fs-toc-h: clamp(16px, calc(var(--u) * 1.5), 28px);
+            --fs-toc: clamp(13px, calc(var(--u) * 1.2), 22px);
+            --fs-toc-num: clamp(19px, calc(var(--u) * 2), 30px);   /* số câu trong mục lục */
+            --box-w: clamp(34px, calc(var(--u) * 3.2), 64px);
+            --box-h: clamp(42px, calc(var(--u) * 4), 80px);
+        }
+        html { -webkit-text-size-adjust: 100%; }
+        @supports (height: 100dvh) { body, html { height: 100dvh; } }
+
+        /* BẬT TÍNH NĂNG CUỘN CHO NỘI DUNG SLIDE */
+        .slide-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; overflow-y: auto; overflow-x: hidden; padding-right: 7px; padding-bottom: 30px; }
+        /* Trang trí thanh cuộn */
+        .slide-content::-webkit-scrollbar { width: 8px; }
+        .slide-content::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        .slide-content::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        .question-box { font-size: var(--fs-q); line-height: 1.5; transition: all 0.3s ease; }
+        .solution-box { display: none; font-size: var(--fs-sol); line-height: 1.4; margin-top: 15px; padding: 15px; background: #e2f3f5; border-left: 5px solid #17a2b8; border-radius: 5px; flex-shrink: 0; }
+        
+        /* Trắc nghiệm 1 lựa chọn */
+        .options { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; }
+        .options div { flex: 1 1 45%; background: #f9f9f9; padding: 10px; border: 2px solid #ddd; border-radius: 5px; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
+        .options div:hover:not(.disabled) { background: #e9e9e9; }
+        .options div.selected { border-color: #007bff; background: #e2eefb; }
+        .options div.correct { background: #d4edda !important; border-color: #28a745 !important; color: #155724; font-weight: bold; }
+        .options div.incorrect { background: #f8d7da !important; border-color: #dc3545 !important; color: #721c24; }
+        .options div.disabled { cursor: not-allowed; opacity: 0.8; }
+        
+        /* Trắc nghiệm Đúng/Sai */
+        .tf-row { display: flex; align-items: center; justify-content: space-between; background: #f9f9f9; padding: 8px; margin-top: 10px; border: 2px solid #ddd; border-radius: 3px; }
+        .tf-row .content { flex-grow: 1; padding-right: 15px; font-size: var(--fs-sol); }
+        .tf-actions { display: flex; gap: 10px; }
+        .tf-btn { padding: 10px 20px; font-size: var(--fs-opt); font-weight: bold; border: 2px solid #ccc; border-radius: 5px; cursor: pointer; background: #fff; transition: 0.2s; user-select: none; }
+        .tf-btn.selected { border-color: #007bff; background: #e2eefb; color: #0056b3; }
+        .tf-btn.correct { background: #d4edda !important; border-color: #28a745 !important; color: #155724; }
+        .tf-btn.incorrect { background: #f8d7da !important; border-color: #dc3545 !important; color: #721c24; }
+        
+        /* Trắc nghiệm Trả lời ngắn */
+        .short-ans-group-slide { display: flex; gap: 5px; margin-top: 15px; }
+        .short-ans-box-slide { width: var(--box-w); height: var(--box-h); font-size: var(--fs-sol); text-align: center; border: 1px solid #007bff; border-radius: 8px; font-weight: bold; color: #0056b3; box-sizing: border-box; }
+        .short-ans-box-slide.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .short-ans-box-slide.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .true-ans-text { display: none; color: #28a745; font-weight: bold; font-size: var(--fs-sol); margin-top: 15px; }
+        
+        /* CSS Nút điều khiển */
+        .controls { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 100; background: #fff; padding-left: 10px; box-shadow: -10px 0px 10px white; }
+        button { padding: 10px 20px; font-size: var(--fs-btn); cursor: pointer; border: none; border-radius: 2px; font-weight: bold; transition: 0.3s; }
+        .btn-nav { background: #007bff; color: white; }
+        .btn-nav:hover { background: #0056b3; }
+        .btn-nav:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-sol { background: #28a745; color: white; }
+        .btn-sol:hover { background: #218838; }
+        .btn-check { background: #ffc107; color: black; }
+        .btn-check:hover:not(:disabled) { background: #e0a800; }
+        .btn-check:disabled { background: #ccc; color: #666; cursor: not-allowed; }
+        
+        .scale-down .question-box { font-size: var(--fs-q-sm); }
+        .scale-down .options div, .scale-down .tf-row .content, .scale-down .tf-btn { font-size: var(--fs-opt); }
+        
+        mjx-container { max-width: 100%; }
+        /* --- SVG / ẢNH + KHUNG ZOOM DÙNG CHUNG (khung tự co giãn, không đặt chiều cao cố định) --- */
+        :root {
+            --zoom-accent: #1e88e5; --zoom-accent-hover: #1565c0;
+            --zoom-border: #b3d4fc; --zoom-bar-bg: #eef6fc; --zoom-max-h: none;
+        }
+        svg { max-width: 100%; height: auto; display: block; margin: 10px auto; overflow: visible; }
+        svg text { font-family: Arial, sans-serif; }
+        img { max-width: 100%; height: auto; }
+        .zoom-container { display: flex; align-items: flex-start; gap: 10px; margin: 15px 0; }
+        .zoom-viewport {
+            flex: 1 1 auto; min-width: 0;
+            overflow: auto; -webkit-overflow-scrolling: touch;
+            border: 1px solid var(--zoom-border); border-radius: 4px; background: #fff;
+            box-sizing: border-box; padding: 4px;
+        }
+        /* chỉ giới hạn chiều cao và giữ cuộn bên trong khi ảnh đang được phóng to */
+        .zoom-viewport.can-pan { cursor: grab; max-height: var(--zoom-max-h); overscroll-behavior: contain; }
+        .zoom-viewport.dragging { cursor: grabbing; user-select: none; }
+        .zoom-toolbar { display: flex; flex-direction: column; gap: 5px; background: var(--zoom-bar-bg); padding: 5px; border-radius: 4px; border: 1px solid var(--zoom-border); flex-shrink: 0; }
+        .zoom-btn { background: var(--zoom-accent); color: #fff; border: none; padding: 6px 10px; font-size: 14px; border-radius: 4px; cursor: pointer; transition: background .2s, opacity .2s; white-space: nowrap; }
+        .zoom-btn:hover:not(:disabled) { background: var(--zoom-accent-hover); }
+        .zoom-btn:disabled { background: #ccc; cursor: not-allowed; opacity: .6; }
+        .zoom-media { display: block; margin: 0 auto; max-width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
+        .zoom-media.zoomed { width: var(--zw) !important; max-width: none !important; height: auto !important; }
+        /* --- BẢNG DÀI: bọc trong khung cuộn ngang, không làm tràn lề --- */
+        .table-scroll { display: block; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; margin: 10px 0; }
+        .table-scroll > table { margin: 0; max-width: 100%; border-collapse: collapse; }
+        .table-scroll th, .table-scroll td { overflow-wrap: break-word; }
+        /* .table-responsive do TeX2HTML tạo ra: trước đây chỉ mẫu làm bài có CSS này nên bảng rộng bị tràn ở trình chiếu / luyện tập */
+        .table-responsive { display: block; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; margin: 15px 0; }
+        /* --- BẢNG RỘNG TRÊN ĐIỆN THOẠI: gợi ý vuốt ngang, cột đầu cố định, xem toàn màn hình --- */
+        .tbl-box { position: relative; margin: 12px 0; max-width: 100%; min-width: 0; }
+        .tbl-box > .tbl-wrap { position: relative; }
+        .tbl-box .table-responsive, .tbl-box .table-scroll { margin: 0; }
+        .tbl-hint { display: none; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 4px; font-size: 12.5px; color: #5f7b94; }
+        .tbl-box.has-scroll > .tbl-hint { display: flex; }
+        .tbl-open { font: inherit; font-size: 12.5px; padding: 4px 10px; border-radius: 14px; border: 1px solid var(--zoom-border); background: var(--zoom-bar-bg); color: var(--zoom-accent-hover); cursor: pointer; white-space: nowrap; }
+        .tbl-fade { display: none; position: absolute; top: 0; right: 0; bottom: 0; width: 30px; pointer-events: none; background: linear-gradient(to right, rgba(255,255,255,0), rgba(120,140,160,.28)); }
+        .tbl-box.has-scroll:not(.at-end) .tbl-fade { display: block; }
+        .tbl-box.has-scroll table.sticky-first tr > :first-child { position: sticky; left: 0; z-index: 2; background: #fff; box-shadow: 2px 0 4px -2px rgba(0,0,0,.35); }
+        @media (max-width: 600px) {
+            .tbl-box td, .tbl-box th { font-size: 14px; padding: 4px 7px !important; }
+        }
+        #tblOverlay { position: fixed; inset: 0; z-index: 99999; background: #fff; display: none; flex-direction: column; }
+        #tblOverlay.open { display: flex; }
+        .tbl-ov-bar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--zoom-bar-bg); border-bottom: 1px solid var(--zoom-border); }
+        .tbl-ov-bar .ttl { flex: 1; min-width: 0; font-size: 13px; font-weight: bold; color: #333; }
+        .tbl-ov-body { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: 10px; touch-action: pan-x pan-y; }
+        .tbl-ov-body table { margin: 0; width: auto; max-width: none; border-collapse: collapse; font-size: calc(15px * var(--tbl-s, 1)); }
+        .tbl-ov-body td, .tbl-ov-body th { font-size: inherit !important; padding: 5px 9px; }
+
+        :root { --zoom-accent: #17a2b8; --zoom-accent-hover: #138496; --zoom-border: #ced4da; --zoom-bar-bg: #f8f9fa; --zoom-max-h: 70vh; }
+        .slide { display: none; height: 100%; flex-direction: column; }
+        .slide.active { display: flex; }
+
+
+        .slide-counter { align-self: center; font-weight: bold; color: #555; font-size: var(--fs-btn); white-space: nowrap; min-width: 3.6em; text-align: center; }
+        .tf-row { flex-wrap: wrap; gap: 8px; }
+
+        @media (max-width: 700px) {
+            .slide-container { width: 100vw; height: 100vh; height: 100dvh; border-radius: 0; padding: 8px; }
+            .slide-header { margin-bottom: 10px; padding-bottom: 6px; }
+            .options div { flex-basis: 100%; }
+            .slide { height: auto; flex: 1 1 auto; min-height: 0; }
+            .slide-content { padding-bottom: 10px; }
+            .controls { position: static; width: 100%; box-shadow: none; padding: 8px 0 0; background: transparent; flex-shrink: 0; justify-content: space-between; }
+            .controls button { flex: 1; padding: 10px 6px; }
+            .controls .btn-fs { flex: 0 0 auto; }
+        }
+        @media (max-height: 500px) {
+            .slide-header { margin-bottom: 8px; padding-bottom: 6px; }
+            .slide-content { padding-bottom: 50px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; }
+        }
+
+        .author-footer { position: absolute; left: 14px; bottom: 24px; max-width: 38%; z-index: 90; background: #fff; padding: 2px 10px 2px 0; color: #6b7280; font-size: clamp(11px, calc(var(--u) * 0.9), 16px); line-height: 1.3; }
+        .author-footer:empty { display: none; }
+        @media (max-width: 700px) {
+            .author-footer { position: static; max-width: 100%; text-align: center; padding: 6px 0 0; flex-shrink: 0; }
+        }
+
+        /* --- MỤC LỤC: tấm trượt từ dưới lên, có trạng thái từng câu --- */
+        .btn-toc { background: #17a2b8; color: white; cursor: pointer; }
+        .slide-container:focus { outline: none; }
+
+        .toc-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            display: flex; justify-content: center; align-items: flex-end;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+        .toc-content {
+            background: #fff; width: 80vw; max-width: 900px; max-height: 85vh; max-height: 85dvh;
+            border-radius: 15px 15px 0 0; padding: 12px 25px 0;
+            display: flex; flex-direction: column; box-sizing: border-box;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .toc-modal.active { opacity: 1; visibility: visible; }
+        .toc-modal.active .toc-content { transform: translateY(0); }
+
+        .toc-handle { flex-shrink: 0; padding: 4px 0 10px; touch-action: none; cursor: grab; }
+        .toc-handle span { display: block; width: 46px; height: 5px; border-radius: 3px; background: #cbd5e1; margin: 0 auto; }
+        .toc-content h3 { flex-shrink: 0; margin: 0 0 4px; color: #0056b3; font-size: var(--fs-toc-h); text-align: center; }
+        .toc-summary { flex-shrink: 0; text-align: center; color: #333; font-size: var(--fs-btn); margin: 2px 0 8px; }
+        .toc-legend { flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 6px 10px; justify-content: center; margin-bottom: 8px; font-size: clamp(11px, calc(var(--u) * 0.9), 15px); }
+        .toc-legend span { padding: 1px 9px; border: 2px solid; border-radius: 12px; white-space: nowrap; }
+
+        .toc-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 4px 2px 8px; }
+        .toc-group-title { margin: 12px 0 4px; color: #495057; font-size: var(--fs-btn); }
+        .toc-group-title:first-child { margin-top: 2px; }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 8px; padding: 8px; }
+
+        .toc-item {
+            position: relative; display: flex; align-items: center; justify-content: center;
+            min-height: 44px; padding: 2px; border: 2px solid #007bff; border-radius: 6px;
+            background: #e2eefb; color: #0056b3; font-family: inherit; font-weight: bold; font-size: var(--fs-toc-num);
+            line-height: 1; cursor: pointer; user-select: none; transition: filter .15s, transform .15s;
+        }
+        /* ký hiệu trạng thái: dấu nhỏ ở góc trên bên phải để ô thấp, số to */
+        .toc-item .m { position: absolute; top: 1px; right: 4px; font-size: 11px; line-height: 1; }
+        .toc-item:hover { filter: brightness(0.94); transform: translateY(-1px); }
+        .toc-item:focus-visible { outline: 3px solid #ff9800; outline-offset: 2px; }
+        .toc-item.current { box-shadow: 0 0 0 3px #fff, 0 0 0 6px #0056b3; }
+        .toc-s-correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .toc-s-wrong   { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .toc-s-partial { background: #fff3cd; border-color: #ff9800; color: #7a4b00; }
+        .toc-s-picked  { background: #fffbe6; border-style: dashed; border-color: #d39e00; color: #7a5c00; }
+        .toc-s-none    { background: #f1f3f5; border-color: #adb5bd; color: #495057; }
+        .toc-s-empty   { background: #e2eefb; border-color: #007bff; color: #0056b3; }
+
+        .toc-footer { flex-shrink: 0; display: flex; justify-content: center; padding: 10px 0 calc(12px + env(safe-area-inset-bottom)); }
+        .toc-close { background: #dc3545; font-size: var(--fs-btn); min-width: 120px; }
+        .toc-close:hover { background: #b02a37; }
+
+        @media (max-width: 700px) {
+            .toc-content { width: 100vw; max-width: none; max-height: 88vh; max-height: 88dvh; padding: 8px 14px 0; }
+            .toc-grid { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; padding: 6px; }
+            .toc-item { min-height: 42px; }
+        }
+        @media (max-height: 500px) {
+            .toc-content { max-height: 96vh; max-height: 96dvh; }
+            .toc-legend { display: none; }
+        }
+
+        
+        /* ===== Bổ sung của bộ chuyển đổi TeX2HTML (PyQt6) ===== */
+        .tp { margin: 6px 0; }
+        .center { text-align: center; }
+        /* Huy hiệu mức độ khó (suy ra từ ID câu hỏi, HTML bài giảng) */
+        .lvl { display: inline-block; margin-left: 8px; padding: 1px 10px; border-radius: 12px; border: 1px solid; font-size: 12px; font-weight: bold; line-height: 1.6; white-space: nowrap; vertical-align: middle; cursor: help; }
+        .lvl .dots { letter-spacing: 1px; margin-right: 4px; }
+        .lvl.lv1 { background: #e6f4ea; border-color: #34a853; color: #1b6b32; }
+        .lvl.lv2 { background: #e3f0fb; border-color: #4a90d9; color: #0d47a1; }
+        .lvl.lv3 { background: #fff3e0; border-color: #fb8c00; color: #8a4b00; }
+        .lvl.lv4 { background: #fdeaea; border-color: #e53935; color: #a31515; }
+        .figure svg, .figure img { max-width: 100%; height: auto; }
+        .fig-error { color: #b00020; border: 1px dashed #b00020; padding: 6px 10px; text-align: center; margin: 8px 0; font-size: 14px; }
+        .fbox { border: 1px solid currentColor; padding: 0 4px; }
+        blockquote { margin: 8px 20px; }
+        img { max-width: 100%; height: auto; }
+        ul, ol { margin: 6px 0; padding-left: 24px; }
+        ul.desc, li.cl { list-style: none; }
+        li.cl .lbl { font-weight: bold; margin-right: .4em; }
+        ol[class^="paren-"] { list-style: none; counter-reset: pc; padding-left: 2.2em; }
+        ol[class^="paren-"] > li { counter-increment: pc; position: relative; margin: 4px 0; }
+        ol[class^="paren-"] > li::before { position: absolute; left: -2.2em; width: 2em; text-align: right; font-weight: bold; }
+        ol.paren-a > li::before { content: counter(pc, lower-alpha) ")"; }
+        ol.paren-A > li::before { content: counter(pc, upper-alpha) ")"; }
+        ol.paren-i > li::before { content: counter(pc, lower-roman) ")"; }
+        ol.paren-I > li::before { content: counter(pc, upper-roman) ")"; }
+        ol.paren-1 > li::before { content: counter(pc, decimal) ")"; }
+        table.tex-table { border-collapse: collapse; margin: 8px auto; }
+        table.tex-table td { padding: 4px 10px; }
+        table.tex-table.bordered td { border: 1px solid #555; }
+        .tex-fa { margin: 0 .25em; font-style: normal; }
+
+
+    </style>
+
+    <script>
+        window.MathJax = {
+          tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], processEscapes: true, macros: {"wideparen": ["\\overset{\\frown}{#1}", 1], "overarc": ["\\overset{\\frown}{#1}", 1]} },
+          options: { enableMenu: false }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+<style>
+mjx-container[jax="CHTML"][display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+mjx-container.fv-wide { cursor: zoom-in; outline: 1px dashed rgba(30,136,229,.6); outline-offset: 2px; border-radius: 3px; }
+.fv-btn { font: bold 12px Arial, sans-serif; line-height: 1.4; color: #1565c0; background: #fff; border: 1px solid #1e88e5; border-radius: 12px; padding: 2px 9px; margin: 0 4px; cursor: pointer; vertical-align: middle; white-space: nowrap; }
+.fv-btn.blk { display: block; margin: 2px 0 8px auto; }
+.fv-btn:active { background: #e3f0fb; }
+html.fv-lock, html.fv-lock body { overflow: hidden !important; }
+.fv-ov { position: fixed; inset: 0; z-index: 100000; display: none; flex-direction: column; background: #fff; color: #1c2b3a; font-family: Arial, sans-serif; }
+.fv-ov.open { display: flex; }
+.fv-bar { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 8px 10px; background: #1e88e5; color: #fff; }
+.fv-bar .fv-t { flex: 1 1 auto; font-weight: bold; font-size: 14px; }
+.fv-bar button { background: #fff; color: #1565c0; border: none; border-radius: 5px; padding: 6px 11px; min-width: 38px; font-weight: bold; font-size: 14px; cursor: pointer; }
+.fv-hint { flex: 0 0 auto; display: none; background: #fff3cd; color: #7a5600; font-size: 12px; padding: 4px 10px; }
+.fv-body { flex: 1 1 auto; overflow: auto; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; padding: 16px 12px 40px; background: #fff; }
+.fv-stage { width: max-content; min-width: 100%; }
+.fv-stage mjx-container { display: block !important; margin: 0 !important; max-width: none !important; overflow: visible !important; text-align: left !important; }
+</style>
+</head>
+<body>
+    <div class="slide-container" id="mainContainer" tabindex="-1">
+        <div class="slide" id="slide-0" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 1</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-0')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tính giá trị của các biểu thức sau <ul style="column-count: 3; -webkit-column-count: 3; column-gap: 20px; -webkit-column-gap: 20px;"><li>$A=\dfrac{3^{10}\cdot10+3^{10}\cdot6}{3^9\cdot2^{2^2}}$.</li><li>$B=\dfrac{11\cdot3^{22}\cdot3^7-9^{15}}{(2\cdot3^{14})^2}$.</li><li>$C=\dfrac{36^{10}\cdot25^{15}}{30^8}$.</li><li>$D=\dfrac{21^2\cdot14\cdot126}{35^5\cdot6}$.</li><li>$E=\dfrac{4^9\cdot36+64^4}{100\cdot16^4}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$A=\dfrac{3^{10}\cdot10+3^{10}\cdot6}{3^9\cdot2^{2^2}}=\dfrac{3^{10}\cdot(10+6)}{3^9\cdot2^4}=\dfrac{3^{10}\cdot2^4}{3^9\cdot2^4}=3$.</li><li>$B=\dfrac{11\cdot3^{22}\cdot3^7-9^{15}}{(2\cdot3^{14})^2}=\dfrac{11\cdot3^{29}-3^{30}}{4\cdot3^{28}}=\dfrac{3^{29}(11-3)}{4\cdot3^{28}}=\dfrac{3\cdot8}{4}=6$.</li><li>$C=\dfrac{36^{10}\cdot25^{15}}{30^8}=\dfrac{(6^2)^{10}\cdot(5^2)^{15}}{(6\cdot5)^8}=\dfrac{6^{20}\cdot5^{30}}{6^8\cdot5^8}=6^{12}\cdot5^{22}$.</li><li>$D=\dfrac{21^2\cdot14\cdot126}{35^5\cdot6}=\dfrac{3^2\cdot7^2\cdot2\cdot7\cdot2\cdot3^2\cdot7}{3^5\cdot7^5\cdot2\cdot3}=\dfrac{2^2\cdot3^4\cdot7^4}{2\cdot3^6\cdot7^5}=\dfrac{2}{3^2\cdot7}$.</li><li>$E=\dfrac{4^9\cdot36+64^4}{100\cdot16^4}=\dfrac{4^9\cdot4\cdot9+4^{12}}{100\cdot4^8}=\dfrac{4^{10}\cdot(9+4^2)}{4^8\cdot100}=\dfrac{4^2\cdot25}{100}=4$ .</li></ul></div></div></div></div>
+<div class="slide" id="slide-1" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 2</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-1')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Viết các tích sau dưới dạng lũy thừa. <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$3y\cdot3y\cdot3y$ $(y\neq 0)$.</li><li>$x^1\cdot x^2\cdots x^{100}$ $(x\neq 0)$.</li><li>$z^1\cdot z^4\cdot z^7\cdots z^{100}$ $(z\neq 0)$.</li><li>$(m^1)^2\cdot(m^2)^3\cdot(m^3)^4\cdots(m^{99})^{100}$ $(m\neq 0)$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$3y\cdot3y\cdot3y=(3y)^3$ $(y\neq 0)$.</li><li>$x^1\cdot x^2\cdots x^{100}=x^{5050}$ $(x\neq 0)$.</li><li>$z^1\cdot z^4\cdot z^7\cdots z^{100}=z^{1+4+7+\cdots+100}=z^{(100+1)\cdot34:2}=z^{101\cdot17}$ $(z\neq 0)$.</li><li>$(m^1)^2\cdot(m^2)^3\cdot(m^3)^4\cdots(m^{99})^{100}=m^{1\cdot2}\cdot m^{2\cdot3}\cdots m^{99\cdot100}=m^{\dfrac{1}{3}\cdot99\cdot100\cdot101}$ $(m\neq 0)$ .</li></ul></div></div></div></div>
+<div class="slide" id="slide-2" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 3</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-2')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tính các tổng sau. <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$A=1+2^1+2^2+\cdots+2^{2015}$.</li><li>$B=1+3^1+3^2+\cdots +3^{2016}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$A=1+2^1+2^2+\cdots+2^{2015}\Rightarrow 2A=2+2^2+2^3+\cdots+2^{2016}\Rightarrow 2A-A=A=2^{2016}-1$.</li><li>$B=1+3^1+3^2+\cdots +3^{2016}\Rightarrow 3B=3+3^2+\cdots3^{2017}\Rightarrow 2B=3^{2017}-1\Rightarrow B=\dfrac{3^{2017}-1}{2}$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-3" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 4</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-3')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tính $S=1+2+4+8+\cdots+8192$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $S=2^0+2^1+2^2+\cdots+2^{13}\Rightarrow 2S=2+2^2+2^3+\cdots +2^{14}\Rightarrow S=2^{14}-1=16383$ .</div></div></div></div>
+<div class="slide" id="slide-4" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 5</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-4')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Viết các tổng sau thành bình phương của một số tự nhiên. <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$1^3$.</li><li>$1^3+2^3$.</li><li>$1^3+2^3+3^3$.</li><li>$1^3+2^3+3^3+4^3$.</li><li>Phát biểu dưới dạng tổng quát (không cần chứng minh)</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$1^3=1^2$.</li><li>$1^3+2^3=(1+2)^2$.</li><li>$1^3+2^3+3^3=(1+2+3)^2$.</li><li>$1^3+2^3+3^3+4^3=(1+2+3+4)^2$.</li><li>$1^3+2^3+3^3+\cdots+n^3=(1+2+3+\cdots+n)^3$ $(n\ge 1; n\in\mathbb{N})$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-5" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 6</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-5')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Cho $A=1+2^1+2^2+\cdots+2^{2015}$. Viết $A+1$ dưới dạng lũy thừa của $8$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $A=2^{2016}-1\Rightarrow A+1=2^{2016}=(2^3)^{672}=8^{672}$ .</div></div></div></div>
+<div class="slide" id="slide-6" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 7</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-6')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Cho $B=3+3^2+3^3+\cdots +3^{2015}$. Chứng minh rằng $2B+3$ là lũy thừa của $3$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $B=\dfrac{3^{2016}-3}{2}\Rightarrow 2B+3=3^{2016}$ .</div></div></div></div>
+<div class="slide" id="slide-7" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 8</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-7')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Chứng minh rằng <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$A=10^{2008}+125$ chia hết cho $45$.</li><li>$B=5^{2008}+5^{2007}+5^{2006}$ chia hết cho $31$.</li><li>$C=8^8+2^{20}$ chia hết cho $17$.</li><li>$D=313^5\cdot299-313^6\cdot36$ chia hết cho $7$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Ta có $A=10^{2008}+125=100...0+125=100...0125$, $A$ có tận cùng là $5 \Rightarrow A$ chia hết cho $5$.<br> Tổng các chữ số của $A$ là: $1+2+5+1=9 \Rightarrow A$ chia hết chi $9$, mà $(5,9)=1$.<br> Vậy $A$ chia hết cho $45$.</li><li>$B=5^{2008}+5^{2007}+5^{2006}=5^{2006}\cdot(5^2+5^1+1)=5^{2006}\cdot31$ chia hết cho $31$.</li><li>$C=8^8+2^{20}=(2^3)^8+2^{20}=2^{24}+2^{20}=2^{20}\cdot(2^4+1)=17\cdot2^{20}$ chia hết cho $17$.</li><li>$D=313^5\cdot299-313^6\cdot36=313^5\cdot299-313^6-35\cdot 313^6=313^5(299-313)-35\cdot313^6=-14\cdot313^5-35\cdot313^6$ chia hết cho $7$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-8" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 9</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-8')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Cho $A=2+2^2+2^3+\cdots+2^{60}$. Chứng minh rằng $A\; \vdots\; 3$; $A\; \vdots\; 5$; $A\; \vdots\; 7$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $\begin{aligned}[t]
+			A=\;&amp;(2+2^2)+(2^3+2^4)+\cdots+(2^{59}+3^{60})=2\cdot(1+2)+2^3\cdot(1+2)+\cdots+2^{59}\cdot(1+2)\\
+			=\;&amp;(1+2)\cdot(2+2^3+\cdots+2^{59})=3\cdot(2+2^3+\cdots+2^{59})\;\vdots\;3.\\
+			A=\;&amp;(2+2^3)+(2^2+2^4)+\cdots+(2^{58}+2^{60})=2(1+2^2)+2^2(1+2^2)+\cdots+2^{58}(1+2^2)\\
+			=\;&amp;(1+2^2)\cdot(2+2^2+\cdots+2^{58})=5\cdot(2+2^2+\cdots+2^{58})\;\vdots\;5.\\
+			A=\;&amp;(2+2^2+2^3)+(2^4+2^5+2^6)+\cdots+(2^{58}+2^{59}+2^{60})\\
+			=\;&amp;2\cdot(1+2+2^2)+2^4\cdot(1+2+2^2)+\cdots+2^{58}\cdot(1+2+2^2)\\
+			=\;&amp;(1+2+2^2)\cdot(2+2^4+\cdots+2^{58})=7\cdot(2+2^4+\cdots+2^{58})\;\vdots\;7.
+		\end{aligned}$</div></div></div></div>
+<div class="slide" id="slide-9" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 10</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-9')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tính tổng sau $M=1-2+2^2-2^3+\cdots+2^{2008}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $M=1-2+2^2-2^3+\cdots+2^{2008} \Rightarrow 2M=2-2^2+2^3-2^4+\cdots+2^{2009} \Rightarrow 2M+M=3M=2^{2009}+1$.<br> Vậy $M=\dfrac{2^{2009}+1}{3}$.</div></div></div></div>
+<div class="slide" id="slide-10" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 11</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-10')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Hãy so sánh <ul style="column-count: 3; -webkit-column-count: 3; column-gap: 20px; -webkit-column-gap: 20px;"><li>$128^7$ và $4^{24}$;</li><li>$81^{8}$ và $27{11}$;</li><li>$5^{36}$ và $11^{24}$;</li><li>$32^{60}$ và $81^{50}$;</li><li>$3^{500}$ và $7^{300}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Ta có $128^{7}=\left(2^7\right)^7=2^{49}$ và $4^{24}=\left(2^2\right)^{24}=2^{48}$. Suy ra $128^7&gt;4^{24}$.</li><li>Ta có $81^8=3^{32}$ và $27^{11}=3^{33}$. Suy ra $81^{8}&lt;27^{11}$.</li><li>Ta có $5^{36}=125^{12}$ và $11^{24}=121^{12}$. Suy ra $5^{36}&gt;11^{24}$.</li><li>Ta có $32^{60}=2^{300}=8^{100}$ và $81^{50}=3^{200}=9^{100}$. Suy ra $32^{60}&lt;81^{50}$.</li><li>Ta có $3^{500}=243^{100}$ và $7^{300}=343^{100}$. Suy ra $3^{500}&lt;7^{300}$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-11" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 12</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-11')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Hãy so sánh <ul style="column-count: 3; -webkit-column-count: 3; column-gap: 20px; -webkit-column-gap: 20px;"><li>$16^{19}$ và $8^{25}$;</li><li>$27^{11}$ và $81^8$;</li><li>$625^5$ và $125^7$;</li><li>$5^{23}$ và $6\cdot 5^{22}$;</li><li>$7\cdot 2^{13}$ và $2^{16}$;</li><li>$5^{100}$ và $3^{500}$;</li><li>$2^{30}+3^{30}+4^{30}$ và $3\cdot 24^{10}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$16^{19}=2^{76}$ và $8^{25}=2^{75}$. Suy ra $16^{19}&gt;8^{25}$;</li><li>$27^{11}=3^{33}$ và $81^{8}=3^{32}$. Suy ra $27^{11}&gt;81^{8}$;</li><li>$625^5=\left(5^4\right)^{5}=5^{20}$ và $125^7=\left(5^3\right)^{7}=5^{21}$. Suy ra $125^7&gt;625^5$;</li><li>$5^{23}=5\cdot 5^{22}&lt;6\cdot 5^{22}$;</li><li>$2^{16}=8\cdot 2^{13}&gt;7\cdot 2^{13}$;</li><li>$3^{500}=\left(3^{5}\right)^{100}=243^{100}&gt;5^{100}$;</li><li>$4^{30}=2^{30}\cdot 2^{30}=8^{10}\cdot 4^{15}&gt;8^{10}\cdot 3^{15}&gt;8^{10}\cdot 3^{10}\cdot 3=3\cdot 24^{10}$. Suy ra $2^{30}+3^{30}+4^{30}&gt;3\cdot 24^{10}$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-12" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 13</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-12')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">So sánh <ol><li>$3^{2n(n+2)}$ và $9^{(n+1)^2}$;</li><li>$256^n$ và $16^{n+5}$ với $n\in \mathbb{N}$.</li></ol></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ol><li>Ta có \begin{align*}
+				3^{2n(n+2)}&amp;= 9^{n(n+2)}=9^{n^2+2n}\\
+				9^{(n+1)^2}&amp;= 9^{n^2+2n+1}\\
+				n^2+2n+1&amp;&gt; n^2+2n.
+			\end{align*}<br>Do đó $9^{(n+1)^2}&gt;3^{2n(n+2)}$, $\forall n\in \mathbb{N}$.</li><li>Ta có $256^n=16^{2n}$. Suy ra bài toán trở thành so sánh $2n$ và $n+5$. <ul><li>$2n&gt;n+5\Leftrightarrow n&gt;5$.</li><li>$2n=n+5\Leftrightarrow n=5$.</li><li>$2n&lt;n+5\Leftrightarrow n&lt;5$.</li></ul> Như vậy <ul><li>Nếu $0\leq n &lt;5$ thì $256^n&gt;16^{2n}$;</li><li>Nếu $n=5$ thì $256^n=16^{2n}$;</li><li>Nếu $n&gt;5$ thì $256^n&lt;16^{2n}$.</li></ul></li></ol></div></div></div></div>
+<div class="slide" id="slide-13" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 14</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-13')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Chứng minh rằng $5^{27}&lt;2^{63}&lt;5^{28}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $5^{27}=125^9$ và $2^{63}=128^9$. Suy ra $5^{27}&lt;2^{63}$.<br> Mặt khác $2^{63}=\left(2^9\right)^7=312^7$ và $5^{28}=\left(5^4\right)^7=625^7$. Suy ra $2^{63}&lt;5^{28}$.<br> Vậy $5^{27}&lt;2^{63}&lt;5^{28}$.</div></div></div></div>
+<div class="slide" id="slide-14" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 15</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-14')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Hãy so sánh <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$21^{15}$ và $27^5\cdot 49^8$;</li><li>$2015^{2015}-2015^{2014}$ và $2015^{2016}-2015^{2015}$;</li><li>$2015^{10}+2015^9$ và $2016^{10}-2015^{2015}$;</li><li>$A=72^{45}-72^{44}$ và $B=72^{44}-72^{43}$;</li><li>$71^{50}$ và $37^{75}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$21^{15}=3^{15}\cdot 7^{15}$; $27^5 \cdot 49^8=3^{15} \cdot 7^{16}\Rightarrow 21^{15}&lt;27^5 \cdot 49^8$.</li><li>Ta có \begin{align*}
+				2015^{2015}-2015^{2014}&amp;= 2015^{2014}\left(2015-1\right)=2014\cdot 2015^{2014};\\
+				2015^{2016}-2015^{2015}&amp;= 2015^{2015}(2015-1)=2014\cdot 2015^{2015}.
+			\end{align*}<br>Suy ra $2015^{2016}-2015^{2015}&gt;2015^{2015}-2015^{2014}$.</li><li>Ta có $2015^{10}+2015^9&gt;0$ và $2016^{10}-2015^{2015}&lt;0$ nên $2015^{10}+2015^9&gt;2016^{10}-2015^{2015}$;</li><li>Ta có \begin{align*}
+				A&amp;= 72^{45}-72^{44}=72^{44}(72-1)=71\cdot 72^{44};\\
+				B&amp;= 72^{44}-72^{43}=72^{43}(72-1)=71\cdot 72^{43}.
+			\end{align*}<br>Suy ra $A&gt;B$.</li><li>Ta có \begin{align*}
+				71^{50}&lt;72^{50}&amp;= (8\cdot 9)^{50}=2^{150}\cdot 3^{100};\\
+				37^{75}&gt;36^{75}&amp;= (4\cdot 9)^{75}=2^{150}\cdot 3^{150}.
+			\end{align*}<br>Mà $2^{150}\cdot 3^{150}&gt;2^{150}\cdot 3^{100}$, nên $37^{75}&gt;71^{50}$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-15" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 16</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-15')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Hãy so sánh <ul style="column-count: 4; -webkit-column-count: 4; column-gap: 20px; -webkit-column-gap: 20px;"><li>$3^{210}$ và $2^{350}$;</li><li>$2^{31}$ và $3^{21}$;</li><li>$4^30$ và $3\cdot 24^{10}$;</li><li>$202^{303}$ và $303^{202}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$3^{210}=27^{70}$; $2^{350}=32^{70}$. Do đó $3^{210}&lt;2^{350}$;</li><li>$2^{31}=2\cdot 2^{30}=2\cdot 8^{10}$; $3^{21}=3\cdot 3^{20}=3\cdot 9^{10}$. Do đó $3^{21}&gt;2^{31}$;</li><li>$4^{30}=2^{60}=2^{30}\cdot 2^{30}$; $3\cdot 24^{10}=3\cdot \left(3\cdot 8\right)^{10}=3^{11}\cdot 2^{30}$. Do đó $4^{30}&gt;3\cdot 24^{10}$;</li><li>Ta có \begin{align*}
+				202^{303}&amp;= (2\cdot 101)^{303}=2^{303}\cdot 101^{303}=2^{303}\cdot 101^{3\cdot 101}=8^{101}\cdot 101^{3\cdot 101}=8^{101}\cdot 101^{101}\cdot101^{2\cdot 101};\\
+				303^{202}&amp;= (3\cdot 101)^{2\cdot 101}=3^{2\cdot 101}\cdot 101^{2\cdot 101}=9^{101}\cdot 101^{2\cdot 101}.
+			\end{align*}<br>Suy ra $202^{303}&gt;303^{202}$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-16" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 17</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-16')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">So sánh các biểu thức $A=\dfrac{3^{10}\cdot11+3^{10}\cdot5}{3^9\cdot2^4}$ và $B=\dfrac{2^{10}\cdot13+2^{10}\cdot65}{2^8\cdot104}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $A=\dfrac{3^{10}\cdot11+3^{10}\cdot5}{3^9\cdot2^4}=\dfrac{3^{10}(11+5)}{3^9\cdot16}=3$. <br> $B=\dfrac{2^{10}\cdot13+2^{10}\cdot65}{2^8\cdot104}=\dfrac{2^{10}(13+65)}{2^8\cdot104}=3$ $\Rightarrow A=B$.</div></div></div></div>
+<div class="slide" id="slide-17" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 18</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-17')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">So sánh $A$ và $B$ <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$A=\dfrac{10^{15}+1}{10^{16}+1}$ và $B=\dfrac{10^{16}+1}{10^{17}+1}$.</li><li>$A=\dfrac{2^{2008}-3}{2^{2007}-1}$ và $B=\dfrac{2^{2007}-3}{2^{2006}-1}$.</li><li>$A=\dfrac{19^{30}+5}{19^{31}+5}$ và $B=\dfrac{19^{31}+5}{19^{32}+5}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ol><li>So sánh $10A$ và $10B$. Ta có<br> $10A=\dfrac{10^{16}+10}{10^{17}+10}=1+\dfrac{9}{10^{16}+1}$; $10B=\dfrac{10^{17}+10}{10^{18}+10}=1+\dfrac{9}{10^{17}+1}$ $\Rightarrow A&gt;B$.</li><li>So sánh $\dfrac{1}{2}A$ và $\dfrac{1}{2}B$. Ta có<br> $\dfrac{1}{2}A=\dfrac{2^{2008}-3}{2^{2008}-2}=1-\dfrac{1}{2^{2008}-2}$; $\dfrac{1}{2}B=\dfrac{2^{2007}-3}{2^{2007}-2}=1-\dfrac{1}{2^{2007}-2}$; $\Rightarrow A&gt;B$.</li><li>So sánh $19A$ và $19B$ $\Rightarrow A&gt;B$.</li></ol></div></div></div></div>
+<div class="slide" id="slide-18" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 19</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-18')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">So sánh $A=\dfrac{1}{101^2}+\dfrac{1}{102^2}+\dfrac{1}{103^2}+\dfrac{1}{104^2}+\dfrac{1}{105^2}$ và $\dfrac{1}{2^2\cdot3\cdot5^2\cdot7}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta xét số hạng tổng quát $\dfrac{1}{n^2}&lt;\dfrac{1}{n(n-1)}=\dfrac{1}{n-1}-\dfrac{1}{n}$, do đó ta có<br> $$A&lt;\dfrac{1}{100}-\dfrac{1}{105}=\dfrac{105-100}{100\cdot105}=\dfrac{1}{2^2\cdot5^2\cdot3\cdot7}.$$</div></div></div></div>
+<div class="slide" id="slide-19" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 20</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-19')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">So sánh $A=\left(\dfrac{1}{2^2}-1\right)\left(\dfrac{1}{3^2}-1\right)\cdots\left(\dfrac{1}{100^2}-1\right)$ và $-\dfrac{1}{2}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $-A=\left(1-\dfrac{1}{2^2}\right)\left(1-\dfrac{1}{3^2}\right)\cdots\left(1-\dfrac{1}{100^2}\right)=\dfrac{1\cdot3}{2^2}\cdot\dfrac{2\cdot4}{3^2}\dfrac{3\cdot5}{4^2}\cdots\dfrac{99\cdot101}{100^2}=\dfrac{1}{100}\cdot\dfrac{101}{2}=\dfrac{101}{200}&gt;\dfrac{1}{2}$<br> $\Rightarrow A&lt;\dfrac{-1}{2}$.</div></div></div></div>
+<div class="slide" id="slide-20" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 21</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-20')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số tự nhiên $x$ biết <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$6^x=216$;</li><li>$3^{2x}=81$;</li><li>$(x-2)^6=(x-2)^8$;</li><li>$2(2x-1)^2=50$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$6^x=6^3\Rightarrow x=3$;</li><li>$3^{2x}=3^4\Rightarrow x=2$;</li><li>$\left[\begin{aligned}&amp; x-2=0 \\ &amp; x-2=1\end{aligned}\right.\Rightarrow\left[\begin{aligned}&amp; x=2 \\ &amp; x=3\end{aligned}\right.$;</li><li>$(2x-1)^2=5^2\Rightarrow x=3$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-21" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 22</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-21')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số tự nhiên $x$ biết <ul style="column-count: 3; -webkit-column-count: 3; column-gap: 20px; -webkit-column-gap: 20px;"><li>$(7x-11)^3=2^5\cdot5^2+200$;</li><li>$7^{3x-2}-3\cdot7^3=7^3\cdot4$;</li><li>$\dfrac{1}{9}\cdot3^5\cdot3^x=3^{2x+1}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ol><li>$(7x-11)^3=2^5\cdot5^2+200\Rightarrow (7x-11)^3=10^3\Rightarrow x=3$.</li><li>$7^{3x-2}-3\cdot7^3=7^3\cdot4\Rightarrow 7^{3x-2}=7^4\Rightarrow x=2$.</li><li>$\dfrac{1}{9}\cdot3^5\cdot3^x=3^{2x+1}\Rightarrow 3^{x+3}=3^{2x+1}\Rightarrow x=2$.</li></ol></div></div></div></div>
+<div class="slide" id="slide-22" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 23</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-22')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm $x$ biết <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$2^x+2^{x+1}+2^{x+2}+2^{x+3}=480$;</li><li>$5^{x+1}-5^x=2\cdot 2^x+8\cdot 2^x$;</li><li>$6^x+6^{x+1}=2^x+2\cdot 2^x+4\cdot 2^x$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$\begin{aligned}[t]
+				2^x+2^{x+1}+2^{x+2}+2^{x+3}=480 &amp;\Leftrightarrow 2^x\left(1+2+2^2+2^3\right)=480\\
+				&amp;\Leftrightarrow 2^x\cdot 15=480\\
+				&amp;\Leftrightarrow 2^x=2^5\\
+				&amp;\Leftrightarrow x=5.
+			\end{aligned}$</li><li>$\begin{aligned}[t]
+				5^{x+1}-5^x=2\cdot 2^x+8\cdot 2^x &amp; \Leftrightarrow 4\cdot 5^x= 10 \cdot 2^x \Leftrightarrow 5^{x-1} = 2^{x-1} \Leftrightarrow x=1.
+			\end{aligned}$</li><li>$6^x+6^{x+1}=2^x+2\cdot 2^x+4\cdot 2^x \Leftrightarrow 7\cdot 6^x=7\cdot 2^x \Leftrightarrow x=0$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-23" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 24</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-23')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm $x$ thuộc $\mathbb{N}$, biết rằng <ul style="column-count: 3; -webkit-column-count: 3; column-gap: 20px; -webkit-column-gap: 20px;"><li>$x^{15}=x$;</li><li>$(2x+1)^3=343$;</li><li>$3^x+25=26\cdot 2^3+2\cdot 3^0$;</li><li>$2^{x+2}-2^x=96$;</li><li>$720\colon [41-(2x-5)]=2^3\cdot 5$;</li><li>$5^{2x-3}-2\cdot 5^2=5^2\cdot 3$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Do $x$ là số tự nhiên nên $$x^{15}=x \Leftrightarrow x\left(x^{14}-1\right)=0 \Leftrightarrow \left[\begin{aligned}&amp;x=0\\ &amp;x=1.\end{aligned}\right.$$</li><li>$(2x+1)^3=343 \Leftrightarrow (2x+1)^3=7^3 \Leftrightarrow 2x+1=7 \Leftrightarrow x=3$.</li><li>$3^x+25=26\cdot 2^3+2\cdot 3^0 \Leftrightarrow 3^x=185$. Do đó không tồn tại $x$ thỏa mãn.</li><li>$2^{x+2}-2^x=96 \Leftrightarrow 3\cdot 2^x=3\cdot 2^5 \Leftrightarrow x=5$.</li><li>$720\colon [41-(2x-5)]=2^3\cdot 5 \Leftrightarrow 41-(2x-5)=18 \Leftrightarrow 2x-5=23 \Leftrightarrow x=14.$</li><li>$5^{2x-3}-2\cdot 5^2=5^2\cdot 3 \Leftrightarrow 5^{2x-3}=5^3 \Leftrightarrow2x-3=3 \Leftrightarrow x=3$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-24" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 25</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-24')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số nguyên dương $x$ biết <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$3^x+3^{x+1}-3^{x+2}+3^{x+3}=594$;</li><li>$\left(2^x+1\right)\left(3^x+1\right)=1394$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$3^x+3^{x+1}-3^{x+2}+3^{x+3}=594 \Leftrightarrow 3^x(1+3-9+27)=594 \Leftrightarrow x=3$</li><li>Do $2^x+1$ là số lẻ, $1&lt;2^x+1&lt;3^x+1$ và $1394=2\cdot 17\cdot 41$ nên từ giả thiết ta có \[\left\{\begin{aligned}&amp;2^x+1=17\\ &amp;3^x+1=82\end{aligned}\right. \Leftrightarrow x=4. \]</li></ul></div></div></div></div>
+<div class="slide" id="slide-25" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 26</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-25')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số tự nhiên $x$ biết $3^x+3^{x+1}+3^{x+2}+3^{x+3}=1080$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có \[3^x+3^{x+1}+3^{x+2}+3^{x+3}=1080 \Leftrightarrow 3^x(1+3+9+27)=1080 \Leftrightarrow x=3. \]</div></div></div></div>
+<div class="slide" id="slide-26" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 27</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-26')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm $x$ biết $x(6-x)^{2003}=(6-x)^{2003}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Từ giả thiết ta có $x=1$ hoặc $(6-x)^{2003}=0$. Vậy $x=1$ hoặc $x=6$.</div></div></div></div>
+<div class="slide" id="slide-27" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 28</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-27')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số tự nhiên $x$ biết $(x-1)^{x+2}=(x-1)^{x+4}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Từ giả thiết ta có \begin{align*}
+			(x-1)^{x+2}\left((x-1)^2-1\right)=0 &amp;\Leftrightarrow \left[\begin{aligned}&amp;(x-1)^{x+2}=0\\ &amp;(x-1)^2=1\end{aligned}\right.\\
+			&amp;\Leftrightarrow \left[\begin{aligned}&amp;x=1\\ &amp;x=2\\ &amp;x=0.\end{aligned}\right.
+		\end{align*}</div></div></div></div>
+<div class="slide" id="slide-28" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 29</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-28')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm hai số tự nhiên $m$ và $n$ biết $2^m+2^n=2^{m+n}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có \begin{align*}
+			2^m+2^n=2^{m+n}&amp;\Leftrightarrow \left(2^m-1\right)\left(2^n-1\right)=1\\
+			&amp;\Leftrightarrow 2^m-1=2^n-1=1\\
+			&amp;\Leftrightarrow m=n=1.
+		\end{align*}</div></div></div></div>
+<div class="slide" id="slide-29" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 30</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-29')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số tự nhiên $x$ biết <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$16^x&lt;128^4$;</li><li>$5^x\cdot 5^{x+1}\cdot 5^{x+2}\le \underbrace{100\dots 0}_{18\ \text{ chữ số}\ 0}\colon 2^{18}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$16^x&lt;128^4 \Leftrightarrow 2^{4x}&lt; 2^28 \Leftrightarrow x&lt;7$. Từ đó $x\in \{0;1;2;3;4;5;6\}$.</li><li>Ta có \begin{align*}
+				5^x\cdot 5^{x+1}\cdot 5^{x+2}\le \underbrace{100\dots 0}_{18\ \text{ chữ số}\ 0}\colon 2^{18} &amp;\Leftrightarrow 5^{3x+3}\le 5^{18}\\
+				&amp;\Leftrightarrow 3x+3\le 18 \\
+				&amp;\Leftrightarrow x\le 5.
+			\end{align*} Suy ra $x\in \{0;1;2;3;4;5\}$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-30" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 31</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-30')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Cho $A=3+3^2+3^3+\cdots +3^{100}$. Tìm số tự nhiên $N$ biết $2A+3=3^n$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có \begin{align*}
+			3A&amp;=3^2+3^3+3^4+\cdots +3^{101}= 3^{101}+A-3
+		\end{align*} Suy ra $2A+3=3^{101}$. Vậy $n=101$.</div></div></div></div>
+<div class="slide" id="slide-31" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 32</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-31')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số nguyên dương $m$ và $n$ sao cho $2^m-2^n=256$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có \[2^m-2^n=256 \Leftrightarrow 2^n\left(2^{m-n}-1\right)=2^8. \] Ta thấy $m&gt;n$, do đó $2^{m-n}-1$ là số lẻ, suy ra \[\left\{\begin{aligned}&amp;2^n=2^8\\ &amp;2^{m-n}-1=1\end{aligned}\right. \Leftrightarrow \left\{\begin{aligned}&amp;m=9\\ &amp;n=8.\end{aligned}\right.\]</div></div></div></div>
+<div class="slide" id="slide-32" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 33</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-32')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số nguyên dương $n$ biết <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$64&lt;2^n&lt;256$;</li><li>$243&gt;3^n\ge 9$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$64&lt;2^n&lt;256 \Leftrightarrow 2^6&lt;2^n&lt;2^8 \Leftrightarrow 6&lt;n&lt;8$. Vậy $n=7$.</li><li>$243&gt;3^n\ge 9\Leftrightarrow 3^5&gt;3^n\ge 3^2\Leftrightarrow 5&gt;n\ge 2$. Vậy $n\in \{2;3;4\}$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-33" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 34</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-33')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số nguyên dương $n$ lớn nhất sao cho $n^{200}&lt;6^{300}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có \begin{align*}
+			n^{200}&lt;6^{300} \Rightarrow \left(n^2\right)^{100}&lt;\left(6^3\right)^{100} \Rightarrow n^2&lt;6^3=216.
+		\end{align*} Từ đó ta tìm được số nguyên dương lớn nhất thỏa mãn là $n=14$.</div></div></div></div>
+<div class="slide" id="slide-34" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 35</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-34')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số nguyên $n$ thỏa mãn $3^{64}&lt;n^{48}&lt;5^{72}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có \begin{align*}
+			3^{64}&lt;n^{48}&lt;5^{72} \Rightarrow \left\{\begin{aligned}&amp;\left(3^4\right)^{16}&lt;\left(|n|^3\right)^{16}\\ &amp; \left(n^2\right)&lt;\left(5^3\right)^{24}\end{aligned}\right. \Rightarrow \left\{\begin{aligned}&amp;81&lt;|n|^3\\ &amp;n^2&lt;125.\end{aligned}\right.
+		\end{align*} Từ đó suy ra $5\le |n|\le 11$. Vậy các số nguyên thỏa mãn là $\{-11;-10;-9;-8;-7;-6;-5;5;6;7;8;9;10;11\}$.</div></div></div></div>
+<div class="slide" id="slide-35" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 36</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-35')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số nguyên dương $x$ thỏa mãn <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$4^{x-1}+4^x=5$;</li><li>$3^x+3^{2x-1}=2268$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Nếu $x&gt;1$ thì \[4^{x-1}+4^x&gt;4^{1-1}+4^1=5. \] Do đó $x\le 1$. Thử lại $x=1$ là giá trị cần tìm.</li><li>Nếu $x&gt;4$ thì \[3^{x}+3^{2x-1}&gt;3^4+3^{2\cdot 4-1}=2268. \] Tương tự, nếu $x&lt;4$ thì $3^x+3^{2x-1}&lt;2268$. Vậy $x=4$ là giá trị cần tìm.</li></ul></div></div></div></div>
+<div class="slide" id="slide-36" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 37</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-36')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số tự nhiên $x$ thỏa mãn <ul style="column-count: 3; -webkit-column-count: 3; column-gap: 20px; -webkit-column-gap: 20px;"><li>$2^x+5^x+7^x=14$;</li><li>$2^x+x=20$;</li><li>$2^x=46-3x$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Dễ thấy $x=1$ thỏa mãn yêu cầu và $x=0$ không thỏa mãn. Với $x&gt;1$ ta có \[2^x+5^x+7^x&gt;2+5+7=14. \] Vậy $x=1$ là giá trị cần tìm.</li><li>Dễ thấy $x=4$ thỏa mãn yêu cầu. Mặt khác \begin{align*}
+				2^x+x&gt;2^4+4=20,\quad \text{ nếu } x&gt;4,\\
+				2^x+x&lt;2^4+4&lt;20,\quad \text{ nếu } x&lt;4.
+			\end{align*} Vậy $x=4$ là giá trị cần tìm.</li><li>Ta có \begin{align*}
+				2^x+3x&gt;2^5+3\cdot 5=47&gt;46,\quad \text{ nếu } x&gt;5,\\
+				2^x+3x&lt;2^4+3\cdot 4=28&lt;46,\quad\text{ nếu } x&lt;4.
+			\end{align*} Vậy không tồn tại $x$ thỏa mãn yêu cầu.</li></ul></div></div></div></div>
+<div class="slide" id="slide-37" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 38</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-37')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số tự nhiên $x$ biết $3^x+3^{x+1}+2^{x+2}=388$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Từ giả thiết ta có $3^x+2^x=97$. Dễ thấy $x=4$ thỏa mãn yêu cầu. Ta có \begin{align*}
+			3^x+2^x&gt;3^4+2^4=97,\quad \text{ nếu } x&gt;4,\\
+			3^x+2^x&lt;3^4+2^4=97,\quad \text{ nếu } x&lt;4.
+		\end{align*} Vậy $x=4$ là giá trị cần tìm.</div></div></div></div>
+<div class="slide" id="slide-38" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 39</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-38')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số tự nhiên $x\le y\le z$ sao cho $2^x+3^y+5^z=156$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Do $5^x&lt;156$ nên $z\le 3$. Nếu $z\le 2$ thì $x\le y\le 2$, do đó \[2^x+3^y+5^z\le 2^2+3^2+5^2&lt;156. \] Do đó $z=3$, suy ra $2^x+3^y=31$. Do đó $y\le 3$. Tương tự chứng minh trên, không xảy ra trường hợp $y\le 2$, do đó $y=3$. Suy ra $2^x=4$ và ta được $x=2$. Vậy $(x;y;z)=(2;3;3)$.</div></div></div></div>
+<div class="slide" id="slide-39" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 40</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-39')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số tự nhiên $x$, $y$, $z$ thỏa mãn $2^{x^2+2}+3^{2y+1}+5^z=40$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $3^{3y+1}&lt;40$ mà $2y+1$ là số lẻ nên $2y+1=1$ hoặc $2y+1=3$ hay $y=0$ hoặc $y=1$. <ul><li>Nếu $y=0$ thì $2^{x^2+2}+5^z=37$. Suy ra $5^z&lt;37$ hay $0\le z\le 2$. <ul><li>Nếu $z=0$ thì $2^{x^2+2}=36$ chia hết cho $3$, vô lí.</li><li>Nếu $z=1$ thì $2^{x^2+2}=32$, suy ra $x^2=3$, vô lí.</li><li>Nếu $z=2$ thì $2^{x^2+2}=12$ chia hết cho $3$, vô lí.</li></ul></li><li>Nếu $y=1$ thì $2^{x^2+2}+5^z=13$. Suy ra $0\le z\le 1$. <ul><li>Nếu $z=0$ thì $2^{x^2+2}=12$, chia hết cho $3$, vô lí.</li><li>Nếu $z=1$ thì $2^{x^2+2}=8$, hay $x^2=1$, ta được $x=1$.</li></ul></li></ul> Vậy $x=y=z=1$.</div></div></div></div>
+<div class="slide" id="slide-40" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 41</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-40')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số tự nhiên $x$, $y$, $z$ thỏa mãn $2^x+2^y+2^z=2^{10}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Do vai trò của $x$, $y$, $z$ là như nhau nên giả sử $x\le y\le z$. Từ giả thiết ta có \begin{align*}
+			2^{x}\left(1+2^{y-x}+2^{z-x}\right)=2^{10}.
+		\end{align*} Điều này chứng tỏ có đúng một trong hai số $y-x$ và $z-x$ bằng $0$, vì ngược lại $1+2^{y-z}+2^{z-x}$ là số lẻ, trong khi $2^{10}$ không có ước lẻ. <ul><li>Nếu $z=x$ thì $x=y=z$, suy ra $2^{10}=3\cdot 2^x$, chia hết cho $3$, vô lí.</li><li>Nếu $y=x$ thì $z\ge x+1$. Suy ra \[2^{10}=2\cdot 2^{x}+2^z=2^{x+1}\left(1+2^{z-x-1}\right). \] Nếu $z-x-1&gt;0$ thì $2^{10}$ có ước lẻ, vô lí. Suy ra $z=x+1$ hay $2^{10}=2^{x+2}$. Từ đó $x=y=8$, $z=9$.</li></ul> Vậy các bộ số $x$, $y$, $z$ thỏa mãn là $(8;8;9)$, $(8;9;8)$, $(9;8;8)$.</div></div></div></div>
+<div class="slide" id="slide-41" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 42</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-41')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số tự nhiên $x$ thỏa mãn $5^x+5^{x+2}=650$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $5^x+5^{x+2}=650 \Leftrightarrow 5^{x}\left(1+5^2\right)=650\Leftrightarrow 5^x=25 \Leftrightarrow x=2$.</div></div></div></div>
+<div class="slide" id="slide-42" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 43</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-42')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số tự nhiên $x$ biết $2^x=46-3x$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Từ giả thiết ta có \[\left(2^x-2^5\right)+3(x-5)=-1. \] Từ đó, nếu $x\ge 5$ thì vế trái không âm, và nếu $x&lt;5$ thì vế trái nhỏ hơn $-1$. Do đó không tồn tại $x$ thỏa mãn yêu cầu.</div></div></div></div>
+<div class="slide" id="slide-43" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 44</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-43')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm số tự nhiên $x$ biết $3^x+3^{x+1}+2^{x+2}=388$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Kiểm tra được rằng nếu $x&gt;4$ thì vế trái nhỏ hơn vế phải, nếu $x&gt;4$ thì vế trái lớn hơn vế phải. Thử lại, $x=4$ thỏa mãn.</div></div></div></div>
+<div class="slide" id="slide-44" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 45</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-44')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số nguyên dương $x$ sao cho $3^x+4^x=5^x$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Từ giả thiết ta có \[\left(\dfrac{3}{5}\right)^x+\left(\dfrac{4}{5}\right)^x=1. \] Dễ thấy nếu $x=1$ không thỏa mãn. Nếu $x\ge 3$ thì \[\left(\dfrac{3}{5}\right)^x+\left(\dfrac{4}{5}\right)^x&lt;\left(\dfrac{3}{5}\right)^2+\left(\dfrac{4}{5}\right)^2=1. \] Thử lại, ta được $x=2$.</div></div></div></div>
+<div class="slide" id="slide-45" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 46</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-45')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số tự nhiên $x$, $y$ sao cho $5x^3=3^y+317$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Dễ thấy $y=0$ không thỏa mãn, đồng thời $x=$, $y=1$ thỏa mãn yêu cầu. Nếu $y\ge 2$ thì $5x^3=3^y+317$ chia $9$ dư $2$. Tuy nhiên $5x^3$ chia $9$ chỉ dư $0$ hoặc $4$. Vậy $x=4$, $y=1$.</div></div></div></div>
+<div class="slide" id="slide-46" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 47</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-46')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số nguyên dương $x$, $y$, $z$ biết $x^2+y^2+z^2=116$ và khi chia $x$, $y$, $z$ cho $2$, $3$, $4$ thì được thương bằng nhau và số dư bằng $0$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Từ giả thiết ta có $x=2n$, $y=3n$ và $z=4n$, với $n$ nguyên dương. Suy ra \[116=x^2+y^2+z^2=\left(2^2+3^2+4^2\right)n^2= 29n^2. \] Do đó $n^2=4$ hay $n=2$. Vậy $x=4$, $y=6$ và $z=8$.</div></div></div></div>
+<div class="slide" id="slide-47" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 48</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-47')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số tự nhiên $x$, $y$ biết rằng <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$2^x+124=5^y$;</li><li>$2^x+80=3^y$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Nếu $x\ge 1$ thì vế trái là số chẵn, trong khi đó vế phải là số lẻ, vô lí. Do đó $x=0$, suy ra $5^y=125$ hay $y=3$.</li><li>Tương tự $x=0$, $y=4$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-48" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 49</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-48')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số nguyên dương $x$, $a$, $b$ biết rằng \[
+	\begin{cases}
+		4x+19=3^a &amp;\qquad(1)\\
+		2x+5=3^b. &amp;\qquad(2)
+	\end{cases}
+	\]</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Nhân cả hai vế của $(2)$ với $-2$, rồi cộng với $(1)$ theo vế ta được \[9=3^a-2\cdot 3^b=3^b\left(3^{a-b}-2\right). \] Suy ra \[\left[\begin{aligned}&amp;\left\{\begin{aligned}&amp;3^{a-b}-2=1\\ &amp;3^b=9\end{aligned}\right.\\ &amp;\left\{\begin{aligned}&amp;3^{a-b}-2=3\\ &amp;3^b=3\end{aligned}\right.\end{aligned}\right. \Rightarrow \left\{\begin{aligned}&amp;a=3\\ &amp;b=2.\end{aligned}\right. \] Thay vao $(1)$, ta được $x=2$. Vậy $x=2$, $a=3$ và $b=2$.</div></div></div></div>
+<div class="slide" id="slide-49" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 50</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-49')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số nguyên dương $x$, $y$ thỏa mãn $2^x+57=y^2$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Nếu $x$ lẻ thì $2^x+57=4^{\frac{x-1}{2}}\cdot 2+57$ chia $3$ dư $2$. Tuy nhiên $y^2$ chia $3$ dưa $0$ hoặc $1$, vô lí. Do đó $x$ chẵn hay tồn tại $k$ nguyên dương sao cho $x=2k$. Suy ra \[\left(y-2^k\right)\left(y+2^k\right)=57=1\cdot 57=3\cdot 13. \] Suy ra \begin{align*}
+			\left[\begin{aligned}&amp;\left\{\begin{aligned}&amp;y-2^k=1\\ &amp;y+2^k=57\end{aligned}\right. &amp;\left\{\begin{aligned}&amp;y-2^k=3\\ &amp;y+2^k=19\end{aligned}\right.\end{aligned}\right. \Rightarrow \left[\begin{aligned}&amp;\left\{\begin{aligned}&amp;y=19\\ &amp;2^k=28\end{aligned}\right.\\ &amp;\left\{\begin{aligned}&amp;y=11\\ &amp;2^k=8\end{aligned}\right.\end{aligned}\right.\Rightarrow \left\{\begin{aligned}&amp;k=3\\ &amp;y=11\end{aligned}\right. \Rightarrow \left\{\begin{aligned}&amp;x=6\\ &amp;y=11.\end{aligned}\right.
+		\end{align*} Thử lại ta được $(x,y)=(6,11)$.</div></div></div></div>
+<div class="slide" id="slide-50" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 51</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-50')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Cho hai số tự nhiên $x$, $y$ thỏa mãn $x^2-2y^2=1$. Chứng minh rằng $y$ là số chẵn.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Nếu $y$ lẻ thì $y^2$ chia $4$ dư $1$, dẫn đến $1=x^2-2y^2$ chia $4$ dư $2$ hoặc $3$. Mâu thuẫn. Vậy $y$ chẵn.</div></div></div></div>
+<div class="slide" id="slide-51" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 52</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-51')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số nguyên dương $a$, $b$, $c$ thỏa mãn $a^3+3a^2+5=5^b$ và $a+3=5^c$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có \[5^b=a^2(a+3)+5=5^ca^2+5. \] Nếu $b,c\ge 2$ thì $5\,\vdots\, 25$, vô lí. Mặt khác từ đẳng thức trên, ta có $5^b&gt;5$, hay $b\ge 2$, do đó $c=1$. Suy ra $a=5^c-3=2$, ta được $b=2$.</div></div></div></div>
+<div class="slide" id="slide-52" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 53</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-52')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm các số nguyên dương $x$, $y$ thỏa mãn $x\le y$ và $x^2+y^2=20^2$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Dễ thấy $4\mid 20^2$ nên $x$, $y$ cùng tính chẵn lẻ. Nếu $x$, $y$ cùng lẻ thì $x^2+y^2$ chia $4$ dư $2$, vô lí, do đó $x$, $y$ cùng chẵn. Viết $x=2x_1$, $y=2y_1$, ta được \[x_1^2+y_1^2= 100. \] Lập luận tương tự, tồn tại $x_2$, $y_2$ nguyên dương sao cho $x_1=2x_2, y_1=2y_2$. Ta được \[x_2^2+y_2^2=25. \] Suy ra một trong hai số $x_2$, $y_2$ chẵn và nhỏ hơn $6$. Thử trực tiếp, ta tìm được $(x_2,y_2)=(3,4)$. Vậy $(x,y)=(12,16)$.</div></div></div></div>
+<div class="slide" id="slide-53" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 54</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-53')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm nghiệm nguyên dương của phương trình $3^x+63=y^2$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Do $3\mid 3^x+63$ nên $3\mid y^2$, suy ra $3\mid y$ hay $y=3y_1$.</div><div class="tp">Do $3^x+63$ là số chẵn nên $y$ chẵn, do đó $4\mid y^2$. Nếu $x=2k+1$ thì $3^{x}+63=3\cdot 9^k+63$ chia $4$ dư $2$. Do đó $x=2k$. Suy ra \[\left(y-3^k\right)\left(y+3^k\right)= \Rightarrow \left(y_1-3^{k-1}\right)\left(y_1+3^{k-1}\right)=7. \] Do đó \begin{align*}
+			\left\{\begin{aligned}&amp;y_1-3^{k-1}=1\\ &amp;y_1+3^{k-1}=7\end{aligned}\right. \Rightarrow \left\{\begin{aligned}&amp;y_1=4\\ &amp;k=2.\end{aligned}\right.
+		\end{align*} Suy ra $(x,y)=(4,12)$.</div></div></div></div>
+<div class="slide" id="slide-54" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 55</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-54')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm chữ số tận cùng của các số sau <ul style="column-count: 3; -webkit-column-count: 3; column-gap: 20px; -webkit-column-gap: 20px;"><li>$215^{2005}$;</li><li>$93^{2005}$;</li><li>$67^{102}$;</li><li>$4^{199}$;</li><li>$2012^{2013}$;</li><li>$2007^{2008}$;</li><li>$2^{3456}$;</li><li>$9^{9^9}$;</li><li>$4^{5^{6^7}}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$215^{2005}$ có chữ số tận cùng là $5$.</li><li>$93^{2005}=93^{4\cdot 501+1}$ có chữ số tận cùng là $3$.</li><li>$67^{102}=67^{4\cdot 25+2}$ có chữ số tận cùng là $9$.</li><li>Do $199$ lẻ nên $4^{199}$ có chữ số tận cùng là $4$.</li><li>$2012^{2013}=2012^{4\cdot 503+1}$ có chữ số tận cùng là $2$.</li><li>$2007^{2008}=2007^{4\cdot 502}$ có chữ số tận cùng là $1$.</li><li>$2^{3456}=2^{4\cdot 864}$ có chữ số tận cùng là $6$.</li><li>Do $9^9$ lẻ nên $9^{9^9}$ có chữ số tận cùng là $9$.</li><li>Do $5^{6^7}$ lẻ nên $4^{5^{6^7}}$ có chữ số tận cùng là $4$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-55" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 56</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-55')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm chữ số tận cùng của các số sau <ul style="column-count: 3; -webkit-column-count: 3; column-gap: 20px; -webkit-column-gap: 20px;"><li>$2002^{2005}$;</li><li>$43^{1999}\cdot 67^{1001}$;</li><li>$98\cdot 98^4\cdot 98^7\cdot 98^{100}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$2002^{2005}=2002^{4\cdot 5001+1}$ có chữ số tận cùng là $2$.</li><li>$43^{1999}=43^{4\cdot 499 +3}$ và $67^{1001}=67^{4\cdot 250+1}$ lần lượt có chữ số tận cùng là $7$ và $7$ nên tích của chúng có chữ số tận cùng là $9$.</li><li>Ta có \begin{align*}
+				98\cdot 98^4\cdot 98^7\cdot 98^{100}=98^{1+4+7+\cdots +100}=98^{1717}=98^{4\cdot 429+1}.
+			\end{align*} Suy ra chữ số tận cùng cần tìm là $8$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-56" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 57</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-56')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm chữ số tận cùng của các số <ul style="column-count: 3; -webkit-column-count: 3; column-gap: 20px; -webkit-column-gap: 20px;"><li>$9^{99^{999}}$;</li><li>$207^{201^{202^{203}}}$;</li><li>$198^{199^{200}}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Do $99^{999}$ là số lẻ nên $9^{99^{999}}$ có chữ số tận cùng là $9$.</li><li>Do $201$ chia $4$ dư $1$ nên $a=201^{202^{203}}$ cũng chia $4$ dư $1$. Suy ra $207^a$ có chữ số tận cùng là $7$.</li><li>Do $199$ lẻ và $200$ chẵn nên $199^{200}$ chia $4$ dư $1$, suy ra $198^{199^{200}}$ có chữ số tận cùng là $8$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-57" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 58</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-57')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Cho $A=17^{2008}-11^{2008}-3^{2008}$. Tìm chữ số tận cùng của $A$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Chữ số tận cùng của $17^{2008}$, $11^{2008}$ và $3^{2008}$ đề là $1$. Do đó chữ số tận cùng của $A$ là $9$.</div></div></div></div>
+<div class="slide" id="slide-58" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 59</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-58')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Chứng tỏ rằng <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$A=2^{2^n}-1\,\vdots\, 5$, với $n\in \mathbb{N}, n\ge 2$;</li><li>$B=2^{4n}+4\,\vdots\, 10$, với $n\in\mathbb{N}^*$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Do $n\ge 2$ nên $4\mid 2^n$, suy ra $2^{2^n}$ có chữ số tận cùng là $6$, do đó $A$ có chữ số tận cùng là $5$. Vậy $5\mid A$.</li><li>Do $2^{4n}$ có chữ số tận cùng là $6$ nên $B$ có chữ số tận cùng là $10$. vậy $10\mid B$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-59" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 60</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-59')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp"><ul><li>Cho $A=999993^{2015}-666667^{2013}$. Chứng minh rằng $10\mid A$;</li><li>Tìm chữ số tận cùng của $B=2\cdot 4\cdot 6\cdots 2016-1\cdot 3\cdot 5\cdots 2015$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Ta có $999993^{2015}=99993^{24\cdot 503+3}$ và $666667^{2013}=666667^{4\cdot 503+1}$ đều có chữ số tận cùng là $7$, do đó $A$ có chữ số tận cùng là $0$ hay $10 \mid A$.</li><li>Dễ thấy $2\cdot 4\cdot 6\cdot 8 \cdot 10\cdots 2016$ có chữ số tận cùng là $0$, mà $1\cdot 3\cdot 5\cdots 2015$ lẻ và chia hết cho $5$ nên có chữ số tận cùng là $5$. Do đó $B$ có chữ số tận cùng là $5$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-60" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 61</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-60')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Chứng minh rằng các số sau là các số tự nhiên <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$A=0{,}7\left(2013^{2003}-1997^{1997}\right)$;</li><li>$B=\dfrac{1}{10}\left(2007^{2012^{2017}-2003^{2014^{2016}}}\right)$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Ta có $2013^{2003} =2013^{4\cdot 500+3}$ và $1997^{1997}=1997^{4\cdot 499+1}$ nên hai số này cùng có tận cùng là $7$. Do đó $10 \mid 2013^{2003}-1997^{1997}$, suy ra $A$ là số tự nhiên.</li><li>Do $2012$ và $2014$ là số chẵn nên $2012^{2017}$ và $2014^{2016}$ đều chia hết cho $4$. Suy ra $2007^{2012^{2017}}$ và $2003^{2014^{2016}}$ đều có tận cùng là $1$, từ đó $B$ là số tự nhiên.</li></ul></div></div></div></div>
+<div class="slide" id="slide-61" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 62</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-61')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Cho $S=7^{2015}03^{2015}$. <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>Tìm chữ số tận cùng của $S$;</li><li>Chứng minh rằng chữ số hàng chục của $S$ là lẻ.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Ta có $7^{2015}=7^{4\cdot 503+3}$ và $3^{2015}=3^{4\cdot 503+3}$ có chữ số tận cùng lần lượt là $3$ và $7$, do đó chữ số tận cùng là $S$ là $6$.</li><li>Ta có \[S=7^{2015}-3^{2015}\,\vdots\, (7-3)=4, \] mà chữ số tận cùng của $S$ là $6$ nên chữ số hàng chục của $S$ là lẻ.</li></ul></div></div></div></div>
+<div class="slide" id="slide-62" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 63</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-62')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm chữ số tận cùng của <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$2014^{2014}$;</li><li>$42^{207^{42}}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Do $2014$ chẵn nên $2014^{2014}$ có chữ số tận cùng là $6$.</li><li>Do $42$ chẵn nên $207^{42}$ chia $4$ dư $1$, dẫn đến $42^{207^{42}}$ có chữ số tận cùng là $2$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-63" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 64</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-63')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Chứng minh rằng $1983^{1983}-1917^{1917}$ là một số tự nhiên chia hết cho $10$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $1983^{1983}=1983^{4\cdot 495+3}$ có chữ số tận cùng là $7$ và $1917^{1917}=1917^{4\cdot 479+1}$ cũng có chữ số tận cùng là $7$. Do đó hiệu của chúng chia hết cho $10$.</div></div></div></div>
+<div class="slide" id="slide-64" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 65</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-64')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm chữ số tận cùng của <ul style="column-count: 2; -webkit-column-count: 2; column-gap: 20px; -webkit-column-gap: 20px;"><li>$S_1=2+2^2+2^3+\cdots +2^{100}$;</li><li>$S_2=1+3+3^2+\cdots +3^{50}$.</li></ul></div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>Ta có \begin{align*}
+				S_1&amp;=\left(2+2^2+2^3+2^4\right)+\cdots \left(2^{97}+2^{98}+2^{99}+2^{100}\right)\\
+				&amp;=30 + 30\cdot 2^4 +30 \cdot 2^8+\cdots+30\cdots 96.
+			\end{align*} Do đó chữ số tận cùng của $S_1$ là $0$.</li><li>Ta có \begin{align*}
+				S_2&amp;=\left(1+3+3^2\right)+ \left(3^3+3^4+3^5+3^6\right)+ \left(3^7+\cdots+3^{10}\right)+ \cdots \left(3^{47}+\cdots +3^{50}\right)\\
+				&amp;= 13+1080+1080\cdot 3^4+ \cdots +1080\cdot 3^{44}.
+			\end{align*} Suy ra chữ số tận cùng của $S_2$ là $3$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-65" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 66</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-65')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Chứng tỏ rằng $C=\left(9^{2n}+3\right) \,\vdots\, 2$, với mọi $n$ nguyên dương.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Dễ thấy $9^{2n}+3$ là tổng hai số lẻ, do đó $C$ chẵn hay $C\,\vdots\, 2$.</div></div></div></div>
+<div class="slide" id="slide-66" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 67</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-66')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tồn tại hay không số tự nhiên $n$ để $n^2+n+1$ chia hêt cho $1995^{2000}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Xét các số dư của $n$ khi chia cho $5$, ta thấy $n^2+n+1$ không chia hết cho $5$, do đó không tồn tại $n$ sao cho $n^2+n+1$ chia hết cho $1995^{2000}$.</div></div></div></div>
+<div class="slide" id="slide-67" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 68</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-67')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm hai chữ số tận cùng của $51^{51}$, $99^{99}$, $6^{666}$, $14^{101}\cdot 16^{101}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$51^{51}=51^{2\cdot 25}\cdot 51$ có hai chữ số tận cùng là $51$.</li><li>$99^{99}=99^{2\cdot 49}\cdot 99$ có hai chữ số tận cùng là $99$.</li><li>$6^{666}=6^{5\cdot 133}\cdot 6=\overline{\cdots 76}^{133}\cdot 6$ có hai chữ số tận cùng là $56$.</li><li>$14^{101}\cdot 16^{101}=224^{101}=\left(224^2\right)^50\cdot 224=\overline{\dots 76}\cdot 224$ có hai chữ số tận cùng là $24$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-68" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 69</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-68')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Với $k$, $n$ là các số nguyên dương, tìm hai chữ số tận cùng của các số sau $51^{2k}$, $51^{2k+1}$, $99^{2n}$, $99^{2n+1}$ $6^{5n}$, $2^{203}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$51^{2k}=\left(51^2\right)^k=\overline{\dots 01}^k$ có hai chữ số tận cùng là $01$. Dẫn đến $51^{2k+1}$ có hai chữ số tận cùng là $51$.</li><li>$99^{2n}=\left(99^2\right)^n=\overline{\dots 01}^n$ có hai chữ số tận cùng là $01$. Dẫn đến $99^{2n+1}$ có hai chữ số tận cùng là $99$.</li><li>$6^{5n}=\left(6^5\right)^n=\overline{\dots 76}^n$ có chữ số tận cùng là $76$.</li><li>$2^{203}=2^{200}\cdot 8=4^{100}\cdot 8 =\overline{\dots 76}\cdot 8$ có hai chữ số tận cùng là $08$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-69" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 70</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-69')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Tìm ba chữ số tận cùng của các số $5^{2000}$, $2^{3n}\cdot 47^{n}$, $2^{3n+3}\cdot 47^{n+2}$.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>$5^{2000}=\left(5^4\right)^{500}=625^{500}=\overline{\dots 625}$.</li><li>$2^{3n}\cdot 47^n=376^n=\overline{\dots 376}$.</li><li>$2^{3n+3}\cdot 47^{n+2}=376^{n+1}\cdot 47=\overline{\dots 376}\cdot 47=\overline{\dots 672}$.</li></ul></div></div></div></div>
+<div class="slide" id="slide-70" data-checked="false" data-type="4"><div class="slide-header"><h2>Câu 71</h2><div style="display: flex; gap: 10px;"><button class="btn-sol" onclick="toggleSolution(this, 'slide-70')">Xem lời giải</button></div></div><div class="slide-content"><div class="question-box"><div class="tp">Chứng tỏ rằng $2001^n+2^{3n}\cdot 47^n+25^{2n}=\overline{\dots 002}$, với $n$ nguyên dương.</div></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có \begin{align*}
+			2001^n+2^{3n}\cdot 47^n+25^{2n}&amp;= \overline{\dots 001}+376^n+625^n\\
+			&amp;=\overline{\dots 001}+\overline{\dots 376}+\overline{\dots 625}=\overline{\dots 002}.
+		\end{align*}</div></div></div></div>
+        
+        <div class="controls">
+            <button class="btn-nav btn-toc" id="tocBtn" onclick="openToc()" aria-haspopup="dialog">📋 Mục lục</button>
+            <button class="btn-nav" id="prevBtn" onclick="changeSlide(-1)" aria-label="Câu trước">Quay lại</button>
+            <span class="slide-counter" id="slideCounter" aria-live="polite"></span>
+            <button class="btn-nav" id="nextBtn" onclick="changeSlide(1)" aria-label="Câu sau">Tiếp theo</button>
+            <button class="btn-nav btn-fs" id="fsBtn" onclick="toggleFullscreen()" title="Toàn màn hình (F)" aria-label="Toàn màn hình">⛶</button>
+        </div>
+        <div class="author-footer">Liên hệ Nguyễn Thành Chương - 0914685866</div>
+    </div>
+
+    <!-- KHUNG POPUP MỤC LỤC -->
+    <div id="tocModal" class="toc-modal" role="dialog" aria-modal="true" aria-labelledby="tocTitle">
+        <div class="toc-content">
+            <div class="toc-handle" id="tocHandle" aria-hidden="true"><span></span></div>
+            <h3 id="tocTitle">Danh sách câu hỏi</h3>
+            <div class="toc-summary" id="tocSummary" aria-live="polite"></div>
+            <div class="toc-legend" aria-hidden="true">
+                <span class="toc-s-correct">✔ Đúng</span><span class="toc-s-wrong">✘ Sai</span><span class="toc-s-partial">½ Đúng một phần</span>
+                <span class="toc-s-picked">● Đã chọn, chưa kiểm tra</span><span class="toc-s-empty">Chưa làm</span>
+            </div>
+            <div class="toc-scroll" id="tocBody"></div>
+            <div class="toc-footer"><button type="button" class="btn-nav toc-close" onclick="closeToc()">Đóng</button></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) slide.classList.add('active');
+            });
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === slides.length - 1;
+            document.getElementById('slideCounter').textContent = (index + 1) + ' / ' + slides.length;
+            
+            const activeContent = slides[index].querySelector('.slide-content');
+            if (activeContent) activeContent.scrollTop = 0;
+
+            // slide vừa hiện ra mới đo được kích thước SVG/ảnh
+            requestAnimationFrame(initMedia);
+        }
+        
+        function changeSlide(step) {
+            currentSlide += step;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            showSlide(currentSlide);
+        }
+        
+        function selectOption(element, slideId) {
+            const slide = document.getElementById(slideId);
+            if (slide.dataset.checked === "true") return; 
+            const options = slide.querySelectorAll('.options div');
+            options.forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        function selectTF(btn, slideId, rowIndex, value) {
+            const slide = document.getElementById(slideId);
+            if (slide.dataset.checked === "true") return;
+            const row = slide.querySelectorAll('.tf-row')[rowIndex];
+            row.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            btn.dataset.val = value;
+        }
+
+        function moveNextSlideAns(current, nextIdx, slideId) {
+            current.value = current.value.replace('.', ',');
+            if (current.value.length > 1) current.value = current.value.slice(0, 1);
+            if (current.value.length === 1) {
+                const nextInput = document.getElementById(`ans_${slideId}_${nextIdx}`);
+                if(nextInput) nextInput.focus();
+            }
+        }
+        function movePrevSlideAns(e, current, prevIdx, slideId) {
+            if (e.key === "Backspace" && current.value === "" && prevIdx >= 1) {
+                const prevInput = document.getElementById(`ans_${slideId}_${prevIdx}`);
+                if(prevInput) prevInput.focus();
+            }
+        }
+
+        function checkAnswer(btn, slideId) {
+            const slide = document.getElementById(slideId);
+            if (slide.dataset.checked === "true") return; 
+            const type = slide.dataset.type;
+
+            if (type === "1") { 
+                const selected = slide.querySelector('.options div.selected');
+                if (!selected) { alert("Vui lòng chọn một phương án!"); return; }
+                const isCorrect = selected.getAttribute('data-correct') === 'true';
+                if (isCorrect) selected.classList.add('correct');
+                else {
+                    selected.classList.add('incorrect');
+                    const correctOption = slide.querySelector('.options div[data-correct="true"]');
+                    if (correctOption) correctOption.classList.add('correct');
+                }
+                slide.querySelectorAll('.options div').forEach(opt => opt.classList.add('disabled'));
+            } 
+            else if (type === "2") { 
+                const rows = slide.querySelectorAll('.tf-row');
+                let allSelected = true;
+                rows.forEach(row => { if (!row.querySelector('.tf-btn.selected')) allSelected = false; });
+                if (!allSelected) { alert("Vui lòng chọn Đúng hoặc Sai cho tất cả các ý!"); return; }
+
+                rows.forEach(row => {
+                    const selectedBtn = row.querySelector('.tf-btn.selected');
+                    const correctVal = row.dataset.correct;
+                    if (selectedBtn.dataset.val === correctVal) {
+                        selectedBtn.classList.add('correct');
+                    } else {
+                        selectedBtn.classList.add('incorrect');
+                        row.querySelectorAll('.tf-btn').forEach(b => {
+                            if (b.innerText === correctVal) b.classList.add('correct');
+                        });
+                    }
+                    row.querySelectorAll('.tf-btn').forEach(b => {
+                        b.style.pointerEvents = 'none';
+                        if(!b.classList.contains('selected') && !b.classList.contains('correct')) b.style.opacity = '0.5';
+                    });
+                });
+            } 
+            else if (type === "3") { 
+                const inputs = slide.querySelectorAll('.short-ans-box-slide');
+                let userAns = "";
+                inputs.forEach(inp => userAns += inp.value);
+                if (userAns.trim() === "") { alert("Vui lòng nhập đáp án!"); return; }
+
+                const correctAns = slide.dataset.correctans;
+                let studentAnsClean = userAns.replace(/,/g, '.').replace(/\s+/g, '');
+                let trueAnsClean = correctAns.replace(/,/g, '.').replace(/\s+/g, '');
+
+                const isCorrect = (studentAnsClean === trueAnsClean);
+                inputs.forEach(inp => {
+                    inp.readOnly = true;
+                    if (isCorrect) inp.classList.add('correct');
+                    else inp.classList.add('incorrect');
+                });
+                
+                const trueAnsDiv = slide.querySelector('.true-ans-text');
+                trueAnsDiv.innerHTML = "Đáp án đúng: " + correctAns;
+                trueAnsDiv.style.display = 'block';
+            }
+
+            // ghi lại kết quả để mục lục tô màu
+            if (type === "1") slide.dataset.result = slide.querySelector('.options div.selected.correct') ? 'correct' : 'wrong';
+            else if (type === "2") {
+                let ok = 0;
+                const rs = slide.querySelectorAll('.tf-row');
+                rs.forEach(r => { const sb = r.querySelector('.tf-btn.selected'); if (sb && sb.dataset.val === r.dataset.correct) ok++; });
+                slide.dataset.result = ok === rs.length ? 'correct' : (ok === 0 ? 'wrong' : 'partial');
+            }
+            else if (type === "3") slide.dataset.result = slide.querySelector('.short-ans-box-slide.correct') ? 'correct' : 'wrong';
+
+            slide.dataset.checked = "true";
+            btn.disabled = true;
+        }
+        
+        function toggleSolution(btn, slideId) {
+            const slide = document.getElementById(slideId);
+            const solBox = slide.querySelector('.solution-box');
+            const contentDiv = slide.querySelector('.slide-content');
+            
+            if (!solBox) { alert("Câu hỏi này chưa có lời giải!"); return; }
+            
+            if (solBox.style.display === 'none' || solBox.style.display === '') {
+                solBox.style.display = 'block';
+                btn.innerHTML = "Ẩn lời giải";
+                btn.style.background = "#dc3545";
+                contentDiv.classList.add('scale-down'); 
+                requestAnimationFrame(initMedia);   // lời giải vừa hiện, đo lại SVG/ảnh bên trong
+            } else {
+                solBox.style.display = 'none';
+                btn.innerHTML = "Xem lời giải";
+                btn.style.background = "#28a745";
+                contentDiv.classList.remove('scale-down');
+            }
+        }
+
+        const MEDIA_SCOPE = '.slide';
+        // =====================================================================
+        // XỬ LÝ SVG / ẢNH (dùng chung cho quiz và trình chiếu)
+        // Mỗi template khai báo trước: const MEDIA_SCOPE = '.vung-chua-hinh, ...';
+        // =====================================================================
+        const MEDIA_SVG_SEL = MEDIA_SCOPE.split(',').map(s => s.trim() + ' svg').join(', ');
+        const MEDIA_ALL_SEL = MEDIA_SCOPE.split(',').map(s => s.trim()).flatMap(s => [s + ' svg', s + ' img']).join(', ');
+
+        // Chỉ nhận số thuần hoặc "px"; "10cm", "50%", "auto"... trả về NaN để không đọc sai đơn vị
+        function svgNum(v) {
+            if (v == null) return NaN;
+            const m = String(v).trim().match(/^([0-9]*\.?[0-9]+)(px)?$/i);
+            return m ? parseFloat(m[1]) : NaN;
+        }
+
+        // Đổi id trong từng SVG thành duy nhất để các hình không dùng nhầm clipPath/marker/gradient của nhau
+        let __svgSeq = 0;
+        function uniquifySvgIds(svg) {
+            if (svg.dataset.idsDone) return;
+            svg.dataset.idsDone = '1';
+            const withId = svg.querySelectorAll('[id]');
+            if (!withId.length) return;
+            const prefix = 'svg' + (++__svgSeq) + '_';
+            const map = {};
+            withId.forEach(n => { map[n.id] = prefix + n.id; });
+            const ids = Object.keys(map);
+            const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const urlRe = /url\(\s*(['"]?)#([^)'"\s]+)\1\s*\)/g;
+            const fixUrls = str => str.replace(urlRe, (m, q, id) => map[id] ? `url(${q}#${map[id]}${q})` : m);
+
+            svg.querySelectorAll('*').forEach(n => {
+                if (n.tagName.toLowerCase() === 'style') {
+                    let css = fixUrls(n.textContent);
+                    css = css.replace(new RegExp('#(' + ids.map(esc).join('|') + ')(?![\\w-])', 'g'), '#' + prefix + '$1');
+                    n.textContent = css;
+                    return;
+                }
+                Array.from(n.attributes).forEach(a => {
+                    if (a.name === 'id' || a.value.indexOf('#') < 0) return;
+                    if ((a.name === 'href' || a.name === 'xlink:href') && a.value.charAt(0) === '#') {
+                        const id = a.value.slice(1);
+                        if (map[id]) n.setAttribute(a.name, '#' + map[id]);
+                    } else {
+                        const nv = fixUrls(a.value);
+                        if (nv !== a.value) n.setAttribute(a.name, nv);
+                    }
+                });
+            });
+            withId.forEach(n => { n.id = map[n.id]; });
+        }
+
+        // Chuẩn hóa SVG: id duy nhất + thêm viewBox nếu thiếu để SVG co giãn đúng
+        function normalizeSvgs() {
+            document.querySelectorAll(MEDIA_SVG_SEL).forEach(svg => {
+                if (svg.closest('mjx-container')) return;
+                uniquifySvgIds(svg);
+                if (svg.dataset.normalized) return;
+                const w = svgNum(svg.getAttribute('width'));
+                const h = svgNum(svg.getAttribute('height'));
+
+                if (!svg.hasAttribute('viewBox')) {
+                    if (w > 0 && h > 0) {
+                        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+                    } else {
+                        try {   // đang bị ẩn thì getBBox lỗi -> sẽ thử lại khi phần chứa nó hiện ra
+                            const b = svg.getBBox();
+                            if (b.width && b.height)
+                                svg.setAttribute('viewBox', `${b.x - 2} ${b.y - 2} ${b.width + 4} ${b.height + 4}`);
+                        } catch (e) { return; }
+                    }
+                }
+                if (svg.hasAttribute('viewBox')) {
+                    if (w > 0) { svg.style.width = '100%'; svg.style.maxWidth = w + 'px'; }  // kích thước gốc làm trần
+                    svg.removeAttribute('height');
+                    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                    svg.dataset.normalized = '1';
+                }
+            });
+        }
+
+        // Zoom: phóng to bằng cách tăng chiều rộng thật, khung tự cao theo, cuộn bằng thanh cuộn gốc
+        const __zoomRefresh = new Set();
+        let __zoomResizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(__zoomResizeTimer);
+            __zoomResizeTimer = setTimeout(() => __zoomRefresh.forEach(fn => fn()), 150);
+        });
+
+        function setupImageZoom() {
+            document.querySelectorAll(MEDIA_ALL_SEL).forEach(el => {
+                if (el.closest('.zoom-container') || el.closest('mjx-container') || el.classList.contains('no-zoom')) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'zoom-container';
+                const viewport = document.createElement('div');
+                viewport.className = 'zoom-viewport';
+                el.parentNode.insertBefore(wrapper, el);
+                viewport.appendChild(el);
+                wrapper.appendChild(viewport);
+                el.classList.add('zoom-media');
+
+                let scale = 1;
+                const STEP = 0.25, MIN = 1, MAX = 4;
+
+                const toolbar = document.createElement('div');
+                toolbar.className = 'zoom-toolbar';
+                const mk = (txt, title) => {
+                    const b = document.createElement('button');
+                    b.type = 'button'; b.className = 'zoom-btn'; b.innerHTML = txt; b.title = title;
+                    b.setAttribute('aria-label', title);
+                    return b;
+                };
+                const btnIn = mk('➕', 'Phóng to'), btnOut = mk('➖', 'Thu nhỏ'), btnReset = mk('↺', 'Mặc định');
+
+                function apply(newScale) {
+                    const cx = viewport.scrollWidth ? (viewport.scrollLeft + viewport.clientWidth / 2) / viewport.scrollWidth : 0.5;
+                    const cy = viewport.scrollHeight ? (viewport.scrollTop + viewport.clientHeight / 2) / viewport.scrollHeight : 0.5;
+
+                    scale = Math.min(MAX, Math.max(MIN, Math.round(newScale * 100) / 100));
+
+                    el.classList.remove('zoomed');
+                    el.style.removeProperty('--zw');
+                    const base = el.getBoundingClientRect().width;   // chiều rộng vừa khung hiện tại
+                    if (scale > 1 && base > 0) {
+                        el.style.setProperty('--zw', (base * scale) + 'px');
+                        el.classList.add('zoomed');
+                        viewport.scrollLeft = cx * viewport.scrollWidth - viewport.clientWidth / 2;
+                        viewport.scrollTop = cy * viewport.scrollHeight - viewport.clientHeight / 2;
+                    }
+                    viewport.classList.toggle('can-pan', el.classList.contains('zoomed'));
+                    btnIn.disabled = scale >= MAX;
+                    btnOut.disabled = scale <= MIN;
+                }
+
+                btnIn.onclick = () => apply(scale + STEP);
+                btnOut.onclick = () => apply(scale - STEP);
+                btnReset.onclick = () => apply(1);
+                __zoomRefresh.add(() => { if (scale > 1) apply(scale); });
+
+                // Ctrl + lăn chuột để zoom, nhấp đúp để phóng to/reset
+                viewport.addEventListener('wheel', e => {
+                    if (!e.ctrlKey) return;
+                    e.preventDefault();
+                    apply(scale + (e.deltaY < 0 ? STEP : -STEP));
+                }, { passive: false });
+                viewport.addEventListener('dblclick', () => apply(scale > 1 ? 1 : 2));
+
+                // Kéo thả bằng chuột (cảm ứng dùng cuộn gốc của trình duyệt)
+                let dragging = false, sx = 0, sy = 0, sl = 0, st = 0;
+                viewport.addEventListener('pointerdown', e => {
+                    if (e.pointerType !== 'mouse' || !el.classList.contains('zoomed')) return;
+                    dragging = true; sx = e.clientX; sy = e.clientY; sl = viewport.scrollLeft; st = viewport.scrollTop;
+                    viewport.setPointerCapture(e.pointerId);
+                    viewport.classList.add('dragging');
+                });
+                viewport.addEventListener('pointermove', e => {
+                    if (!dragging) return;
+                    viewport.scrollLeft = sl - (e.clientX - sx);
+                    viewport.scrollTop = st - (e.clientY - sy);
+                });
+                const stop = () => { dragging = false; viewport.classList.remove('dragging'); };
+                viewport.addEventListener('pointerup', stop);
+                viewport.addEventListener('pointercancel', stop);
+
+                toolbar.append(btnIn, btnOut, btnReset);
+                wrapper.appendChild(toolbar);
+                apply(1);
+            });
+        }
+
+        // Bọc từng <table> trong khung cuộn ngang (bỏ qua bảng của MathJax hoặc bảng đã được bọc)
+        const MEDIA_TABLE_SEL = MEDIA_SCOPE.split(',').map(s => s.trim() + ' table').join(', ');
+        function wrapTables() {
+            document.querySelectorAll(MEDIA_TABLE_SEL).forEach(t => {
+                if (t.closest('mjx-container, .table-scroll, .table-responsive, #tblOverlay')) return;
+                if (!t.parentNode) return;
+                const w = document.createElement('div');
+                w.className = 'table-scroll';
+                t.parentNode.insertBefore(w, t);
+                w.appendChild(t);
+            });
+        }
+
+        // ---- Bảng rộng: gợi ý vuốt ngang, cột đầu cố định, nút xem toàn màn hình ----
+        const __tblRefresh = [];
+        window.addEventListener('resize', () => __tblRefresh.forEach(fn => fn()));
+        function tblState(box, sc) {
+            const over = sc.scrollWidth > sc.clientWidth + 2;
+            box.classList.toggle('has-scroll', over);
+            box.classList.toggle('at-end', !over || sc.scrollLeft + sc.clientWidth >= sc.scrollWidth - 2);
+        }
+        function enhanceTables() {
+            document.querySelectorAll('.table-responsive, .table-scroll').forEach(sc => {
+                if (sc.dataset.tblDone || sc.closest('#tblOverlay')) return;
+                const table = sc.querySelector('table');
+                if (!table || !sc.parentNode) return;
+                sc.dataset.tblDone = '1';
+                const box = document.createElement('div'); box.className = 'tbl-box';
+                const hint = document.createElement('div'); hint.className = 'tbl-hint';
+                const msg = document.createElement('span'); msg.textContent = '\u2194 Vuốt ngang để xem thêm';
+                const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'tbl-open'; btn.textContent = '\u26F6 Xem toàn màn hình';
+                btn.addEventListener('click', e => { e.stopPropagation(); openTableOverlay(table); });
+                hint.append(msg, btn);
+                const wrap = document.createElement('div'); wrap.className = 'tbl-wrap';
+                const fade = document.createElement('div'); fade.className = 'tbl-fade';
+                sc.parentNode.insertBefore(box, sc);
+                box.append(hint, wrap);
+                wrap.append(sc, fade);
+                const first = table.rows[0];
+                if (first && first.cells.length >= 4 && first.cells[0].colSpan === 1 && first.cells[0].rowSpan === 1) table.classList.add('sticky-first');
+                const upd = () => tblState(box, sc);
+                sc.addEventListener('scroll', upd, { passive: true });
+                if (window.ResizeObserver) new ResizeObserver(upd).observe(table);
+                __tblRefresh.push(upd);
+                upd();
+            });
+        }
+        let tblOv = null, tblScale = 1;
+        function closeTableOverlay() {
+            if (!tblOv) return;
+            tblOv.classList.remove('open');
+            document.documentElement.style.overflow = '';
+        }
+        function openTableOverlay(table) {
+            if (!tblOv) {
+                tblOv = document.createElement('div'); tblOv.id = 'tblOverlay';
+                tblOv.innerHTML = '<div class="tbl-ov-bar"><span class="ttl">Kéo để xem; A+ / A\u2212 đổi cỡ chữ</span>'
+                    + '<button type="button" class="zoom-btn" data-a="-">A\u2212</button><button type="button" class="zoom-btn" data-a="+">A+</button>'
+                    + '<button type="button" class="zoom-btn" data-a="x">\u2715 Đóng</button></div><div class="tbl-ov-body"></div>';
+                document.body.appendChild(tblOv);
+                tblOv.addEventListener('click', e => {
+                    const b = e.target.closest('button[data-a]');
+                    if (!b) return;
+                    if (b.dataset.a === 'x') { closeTableOverlay(); return; }
+                    tblScale = Math.min(2.6, Math.max(0.6, tblScale + (b.dataset.a === '+' ? 0.2 : -0.2)));
+                    tblOv.style.setProperty('--tbl-s', tblScale);
+                });
+                window.addEventListener('keydown', e => {                 // đang xem bảng: không để phím chuyển câu / slide
+                    if (!tblOv.classList.contains('open')) return;
+                    e.stopImmediatePropagation();
+                    if (e.key === 'Escape') closeTableOverlay();
+                }, true);
+            }
+            const body = tblOv.querySelector('.tbl-ov-body');
+            body.innerHTML = '';
+            const c = table.cloneNode(true);
+            c.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+            c.classList.remove('sticky-first');
+            body.appendChild(c);
+            tblScale = 1;
+            tblOv.style.setProperty('--tbl-s', 1);
+            tblOv.classList.add('open');
+            document.documentElement.style.overflow = 'hidden';
+            body.scrollTo(0, 0);
+        }
+
+        function initMedia() { wrapTables(); enhanceTables(); normalizeSvgs(); setupImageZoom(); }
+
+        window.addEventListener('load', () => setTimeout(initMedia, 300));
+
+
+        // --- MỤC LỤC ---
+        const TOC_GROUPS = { '1': 'Phần I · Trắc nghiệm', '2': 'Phần II · Đúng/Sai', '3': 'Phần III · Trả lời ngắn', '4': 'Phần IV · Tự luận', 'other': 'Câu khác' };
+        const TOC_MARK = { correct: '✔', wrong: '✘', partial: '½', picked: '●', empty: '', none: '' };
+        const TOC_TEXT = { correct: 'đúng', wrong: 'sai', partial: 'đúng một phần', picked: 'đã chọn, chưa kiểm tra', empty: 'chưa làm', none: '' };
+        let tocOpener = null;
+
+        // Trạng thái một câu: correct | wrong | partial | picked | empty | none (câu không chấm điểm)
+        function slideState(slide) {
+            const type = slide.dataset.type;
+            if (type !== '1' && type !== '2' && type !== '3') return 'none';
+            if (slide.dataset.checked === 'true') return slide.dataset.result || 'none';
+            if (type === '1' && slide.querySelector('.options div.selected')) return 'picked';
+            if (type === '2' && slide.querySelector('.tf-btn.selected')) return 'picked';
+            if (type === '3' && Array.from(slide.querySelectorAll('.short-ans-box-slide')).some(i => i.value.trim() !== '')) return 'picked';
+            return 'empty';
+        }
+
+        function buildToc() {
+            const body = document.getElementById('tocBody');
+            body.textContent = '';
+            const groups = {};
+            const n = { total: 0, done: 0, correct: 0, wrong: 0, partial: 0 };
+
+            slides.forEach((slide, i) => {
+                const st = slideState(slide);
+                const key = TOC_GROUPS[slide.dataset.type] && slide.dataset.type !== 'other' ? slide.dataset.type : 'other';
+                (groups[key] = groups[key] || []).push({ i, st });
+                if (st !== 'none') {
+                    n.total++;
+                    if (st === 'correct' || st === 'wrong' || st === 'partial') { n.done++; n[st]++; }
+                }
+            });
+
+            const keys = ['1', '2', '3', '4', 'other'].filter(k => groups[k]);
+            keys.forEach(k => {
+                if (keys.length > 1) {
+                    const h = document.createElement('h4');
+                    h.className = 'toc-group-title';
+                    h.textContent = TOC_GROUPS[k];
+                    body.appendChild(h);
+                }
+                const grid = document.createElement('div');
+                grid.className = 'toc-grid';
+                groups[k].forEach(({ i, st }) => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'toc-item toc-s-' + st + (i === currentSlide ? ' current' : '');
+                    b.dataset.idx = i;
+                    const label = 'Câu ' + (i + 1) + (TOC_TEXT[st] ? ', ' + TOC_TEXT[st] : '') + (i === currentSlide ? ' (đang xem)' : '');
+                    b.setAttribute('aria-label', label);
+                    b.title = label;
+                    if (i === currentSlide) b.setAttribute('aria-current', 'true');
+                    const num = document.createElement('span'); num.textContent = i + 1;
+                    const mark = document.createElement('span'); mark.className = 'm'; mark.setAttribute('aria-hidden', 'true'); mark.textContent = TOC_MARK[st];
+                    b.append(num, mark);
+                    b.onclick = () => { currentSlide = i; showSlide(i); closeToc(true); };
+                    grid.appendChild(b);
+                });
+                body.appendChild(grid);
+            });
+
+            let txt = 'Đã kiểm tra ' + n.done + '/' + n.total + ' câu';
+            if (n.done) txt += ' · Đúng ' + n.correct + ' · Sai ' + n.wrong + (n.partial ? ' · Một phần ' + n.partial : '');
+            document.getElementById('tocSummary').textContent = n.total ? txt : '';
+        }
+
+        function openToc() {
+            const modal = document.getElementById('tocModal');
+            if (modal.classList.contains('active')) return;
+            tocOpener = document.activeElement;
+            buildToc();
+            modal.classList.add('active');
+            // đợi hộp hiện ra rồi mới chuyển tiêu điểm vào câu đang xem
+            setTimeout(() => {
+                const cur = modal.querySelector('.toc-item.current') || modal.querySelector('.toc-item');
+                if (cur) { cur.focus({ preventScroll: true }); cur.scrollIntoView({ block: 'center', inline: 'nearest' }); }
+            }, 60);
+        }
+
+        // toSlides = true khi vừa chọn một câu: đưa tiêu điểm về vùng trình chiếu để Space/mũi tên tiếp tục chuyển câu
+        function closeToc(toSlides) {
+            const modal = document.getElementById('tocModal');
+            if (!modal.classList.contains('active')) return;
+            modal.classList.remove('active');
+            if (toSlides) document.getElementById('mainContainer').focus({ preventScroll: true });
+            else if (tocOpener && document.contains(tocOpener) && tocOpener.focus) tocOpener.focus({ preventScroll: true });
+            tocOpener = null;
+        }
+
+        (function () {
+            const modal = document.getElementById('tocModal');
+
+            // bấm vào nền tối để đóng (bỏ qua khi kéo chuột từ trong hộp ra ngoài)
+            let downOnBackdrop = false;
+            modal.addEventListener('pointerdown', e => { downOnBackdrop = (e.target === modal); });
+            modal.addEventListener('click', e => { if (e.target === modal && downOnBackdrop) closeToc(); });
+
+            // bàn phím: mũi tên di chuyển giữa các ô, Tab quay vòng trong hộp thoại
+            function vertical(items, cur, dir) {
+                const r = items[cur].getBoundingClientRect(), cx = r.left + r.width / 2;
+                let best = null, bestDy = Infinity, bestDx = Infinity;
+                items.forEach(it => {
+                    if (it === items[cur]) return;
+                    const b = it.getBoundingClientRect();
+                    const dy = dir > 0 ? b.top - r.top : r.top - b.top;
+                    if (dy <= 4) return;                           // chỉ xét các hàng phía dưới (hoặc phía trên)
+                    const dx = Math.abs(b.left + b.width / 2 - cx);
+                    if (dy < bestDy - 4 || (Math.abs(dy - bestDy) <= 4 && dx < bestDx)) { best = it; bestDy = dy; bestDx = dx; }
+                });
+                return best;
+            }
+            modal.addEventListener('keydown', e => {
+                if (e.ctrlKey || e.metaKey || e.altKey) return;
+                if (e.key === 'Tab') {
+                    const f = Array.from(modal.querySelectorAll('button'));
+                    if (e.shiftKey && document.activeElement === f[0]) { f[f.length - 1].focus(); e.preventDefault(); }
+                    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { f[0].focus(); e.preventDefault(); }
+                    return;
+                }
+                const items = Array.from(modal.querySelectorAll('.toc-item'));
+                const cur = items.indexOf(document.activeElement);
+                if (cur < 0) return;
+                let target;
+                switch (e.key) {
+                    case 'ArrowRight': target = items[cur + 1]; break;
+                    case 'ArrowLeft': target = items[cur - 1]; break;
+                    case 'ArrowDown': target = vertical(items, cur, 1); break;
+                    case 'ArrowUp': target = vertical(items, cur, -1); break;
+                    case 'Home': target = items[0]; break;
+                    case 'End': target = items[items.length - 1]; break;
+                    default: return;
+                }
+                if (target) target.focus();
+                e.preventDefault();
+            });
+
+            // điện thoại: vuốt thanh nắm xuống để đóng
+            const content = modal.querySelector('.toc-content'), handle = document.getElementById('tocHandle');
+            let y0 = 0, dy = 0, dragging = false;
+            handle.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; dy = 0; dragging = true; content.style.transition = 'none'; }, { passive: true });
+            handle.addEventListener('touchmove', e => { if (!dragging) return; dy = Math.max(0, e.touches[0].clientY - y0); content.style.transform = 'translateY(' + dy + 'px)'; }, { passive: true });
+            const endDrag = () => {
+                if (!dragging) return;
+                dragging = false;
+                content.style.transition = ''; content.style.transform = '';
+                if (dy > 90) closeToc();
+            };
+            handle.addEventListener('touchend', endDrag);
+            handle.addEventListener('touchcancel', endDrag);
+        })();
+
+                // --- ĐIỀU HƯỚNG BẰNG BÀN PHÍM, VUỐT VÀ TOÀN MÀN HÌNH ---
+        function toggleFullscreen() {
+            if (!document.fullscreenEnabled) return;
+            if (document.fullscreenElement) document.exitFullscreen();
+            else document.documentElement.requestFullscreen().catch(() => {});
+        }
+        if (!document.fullscreenEnabled) document.getElementById('fsBtn').style.display = 'none';
+
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            const t = e.target, tag = t && t.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;   // đang gõ đáp án
+            const tocOpen = document.getElementById('tocModal').classList.contains('active');
+
+            if (e.key === 'Escape') { if (tocOpen) { closeToc(); e.preventDefault(); } return; }
+            if (e.key === 't' || e.key === 'T') { tocOpen ? closeToc() : openToc(); e.preventDefault(); return; }
+            if (tocOpen) return;
+
+            switch (e.key) {
+                case 'ArrowRight': case 'PageDown': changeSlide(1); break;
+                case 'ArrowLeft': case 'PageUp': changeSlide(-1); break;
+                case ' ': if (tag === 'BUTTON') return; changeSlide(e.shiftKey ? -1 : 1); break;
+                case 'Home': currentSlide = 0; showSlide(0); break;
+                case 'End': currentSlide = slides.length - 1; showSlide(currentSlide); break;
+                case 'f': case 'F': toggleFullscreen(); break;
+                default: return;
+            }
+            e.preventDefault();
+        });
+
+        // Vuốt ngang để chuyển câu (bỏ qua khi vuốt trong ảnh đang phóng to, công thức, bảng, ô nhập)
+        (function () {
+            let x0 = 0, y0 = 0, t0 = 0, track = false;
+            const box = document.getElementById('mainContainer');
+            box.addEventListener('touchstart', e => {
+                const blocked = e.target.closest('.zoom-viewport.can-pan, mjx-container, .table-responsive, .table-scroll, .tbl-hint, input, textarea, .controls');
+                if (e.touches.length !== 1 || blocked) { track = false; return; }
+                x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now(); track = true;
+            }, { passive: true });
+            box.addEventListener('touchend', e => {
+                if (!track) return;
+                track = false;
+                const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+                if (Math.abs(dx) > 60 && Math.abs(dx) > 1.5 * Math.abs(dy) && Date.now() - t0 < 800) changeSlide(dx < 0 ? 1 : -1);
+            }, { passive: true });
+        })();
+
+        if (slides.length) showSlide(currentSlide);
+    </script>
+<script>
+(function () {
+    var ov = null, body = null, stage = null, hint = null, base = 16, scale = 1.2, histPushed = false;
+    var root = document.documentElement;
+
+    function setScale(s) {
+        scale = Math.max(0.35, Math.min(4, s));
+        if (stage) stage.style.fontSize = (base * scale) + 'px';
+    }
+    function dist(t) { return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); }
+    function updateHint() {
+        if (!hint) return;
+        var portrait = window.matchMedia && window.matchMedia('(orientation: portrait)').matches;
+        hint.style.display = (portrait && window.innerWidth < 700) ? 'block' : 'none';
+    }
+    function fit() {
+        var m = stage.querySelector('mjx-math');
+        if (!m) return;
+        var w = m.getBoundingClientRect().width;
+        if (w > 0) setScale(scale * (body.clientWidth - 24) / w);
+        body.scrollLeft = 0;
+    }
+    function buildOv() {
+        if (ov) return;
+        ov = document.createElement('div');
+        ov.className = 'fv-ov';
+        ov.setAttribute('role', 'dialog');
+        ov.setAttribute('aria-modal', 'true');
+        ov.innerHTML = '<div class="fv-bar"><span class="fv-t">Công thức dài</span>' +
+            '<button type="button" data-fv="minus" aria-label="Thu nhỏ">A−</button>' +
+            '<button type="button" data-fv="plus" aria-label="Phóng to">A+</button>' +
+            '<button type="button" data-fv="fit">Vừa màn hình</button>' +
+            '<button type="button" data-fv="close" aria-label="Đóng">✕</button></div>' +
+            '<div class="fv-hint">💡 Xoay ngang điện thoại, kéo để xem tiếp hoặc chụm 2 ngón để phóng to / thu nhỏ.</div>' +
+            '<div class="fv-body"><div class="fv-stage"></div></div>';
+        document.body.appendChild(ov);
+        body = ov.querySelector('.fv-body');
+        stage = ov.querySelector('.fv-stage');
+        hint = ov.querySelector('.fv-hint');
+        ov.addEventListener('click', function (e) {
+            var b = e.target.closest ? e.target.closest('[data-fv]') : null;
+            if (!b) return;
+            var a = b.getAttribute('data-fv');
+            if (a === 'minus') setScale(scale / 1.2);
+            else if (a === 'plus') setScale(scale * 1.2);
+            else if (a === 'fit') fit();
+            else if (a === 'close') closeViewer(false);
+        });
+        var pd = 0, ps = 1;
+        body.addEventListener('touchstart', function (e) { if (e.touches.length === 2) { pd = dist(e.touches); ps = scale; } }, { passive: true });
+        body.addEventListener('touchmove', function (e) {
+            if (e.touches.length === 2 && pd) { e.preventDefault(); setScale(ps * dist(e.touches) / pd); }
+        }, { passive: false });
+        body.addEventListener('touchend', function (e) { if (e.touches.length < 2) pd = 0; }, { passive: true });
+    }
+    function openViewer(src) {
+        if (!src || !src.isConnected) return;
+        buildOv();
+        stage.innerHTML = '';
+        var c = src.cloneNode(true);
+        c.classList.remove('fv-wide');
+        stage.appendChild(c);
+        base = parseFloat(window.getComputedStyle(src).fontSize) || 16;
+        setScale(1.2);
+        ov.classList.add('open');
+        root.classList.add('fv-lock');
+        body.scrollTop = 0;
+        body.scrollLeft = 0;
+        updateHint();
+        try { history.pushState({ fv: 1 }, ''); histPushed = true; } catch (e) { histPushed = false; }
+    }
+    function closeViewer(fromPop) {
+        if (!ov || !ov.classList.contains('open')) return;
+        ov.classList.remove('open');
+        root.classList.remove('fv-lock');
+        stage.innerHTML = '';
+        if (!fromPop && histPushed) { histPushed = false; try { history.back(); } catch (e) {} }
+    }
+    window.addEventListener('popstate', function () { histPushed = false; closeViewer(true); });
+    window.addEventListener('resize', updateHint);
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && ov && ov.classList.contains('open')) { e.stopPropagation(); closeViewer(false); }
+    }, true);
+
+    // ---- nhận biết công thức quá rộng ----
+    function isVisible(el) { return el.getClientRects().length > 0; }
+    function isWide(el) {
+        if (el.getAttribute('display') === 'true') return el.scrollWidth - el.clientWidth > 2;
+        var host = el.parentElement;
+        while (host && window.getComputedStyle(host).display === 'inline') host = host.parentElement;
+        var hw = host ? host.clientWidth : window.innerWidth;
+        var r = el.getBoundingClientRect();
+        return r.width > hw - 4 || r.right > window.innerWidth + 2;
+    }
+    function mark(el) {
+        var blk = el.getAttribute('display') === 'true';
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'fv-btn' + (blk ? ' blk' : '');
+        b.textContent = blk ? '🔍 Xem công thức đầy đủ' : '🔍';
+        b.title = 'Xem công thức dài';
+        b._fvSrc = el;
+        el.classList.add('fv-wide');
+        el._fvBtn = b;
+        el.insertAdjacentElement('afterend', b);
+    }
+    function unmark(el) {
+        el.classList.remove('fv-wide');
+        if (el._fvBtn) el._fvBtn.remove();
+        el._fvBtn = null;
+    }
+    function scan() {
+        Array.prototype.forEach.call(document.querySelectorAll('.fv-btn'), function (b) {
+            if (!b._fvSrc || !b._fvSrc.isConnected) b.remove();      // MathJax dàn lại -> nút cũ mồ côi
+        });
+        Array.prototype.forEach.call(document.querySelectorAll('mjx-container'), function (el) {
+            if (el.closest('.fv-ov') || !isVisible(el)) return;
+            var wide = isWide(el);
+            if (wide && !el._fvBtn) mark(el);
+            else if (!wide && el._fvBtn) unmark(el);
+        });
+    }
+    var timer = 0;
+    function later(d) { clearTimeout(timer); timer = setTimeout(scan, d || 200); }
+    new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+            var t = muts[i].target;
+            if (!(t && t.closest && t.closest('.fv-ov'))) { later(200); return; }
+        }
+    }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });
+    window.addEventListener('resize', function () { later(250); });
+    window.addEventListener('orientationchange', function () { later(400); });
+    window.addEventListener('load', function () { later(300); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { later(200); });
+    if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(function () { later(300); });
+    [1000, 2500, 5000].forEach(function (ms) { setTimeout(scan, ms); });
+
+    // bấm nút 🔍 (chặn không cho lọt xuống phương án đang chọn); chạm công thức ở đề / lời giải cũng mở được
+    document.addEventListener('click', function (e) {
+        var t = e.target;
+        if (!t || !t.closest) return;
+        var b = t.closest('.fv-btn');
+        if (b) { e.preventDefault(); e.stopPropagation(); openViewer(b._fvSrc); return; }
+        var f = t.closest('mjx-container.fv-wide');
+        if (f && !f.closest('.fv-ov') && !f.closest('.options, .tf-options, .tf-row, .short-ans-group-slide')) openViewer(f);
+    }, true);
+})();
+</script>
+</body>
+</html>
