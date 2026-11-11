@@ -8,14 +8,14 @@
         * { box-sizing: border-box; }
         [hidden] { display: none !important; }
         html { scroll-behavior: smooth; }
-        body { margin: 0; font-family: Arial, sans-serif; background: #fafbfc; color: #1c2b3a; line-height: 1.6; padding-bottom: 72px; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f7fbff; color: #1c2b3a; line-height: 1.6; padding-bottom: 72px; }
 
-        .topbar { position: sticky; top: 0; z-index: 50; background: #455a64; color: #fff; padding: 8px 14px; box-shadow: 0 2px 6px rgba(69,90,100,.25); }
+        .topbar { position: sticky; top: 0; z-index: 50; background: #1e88e5; color: #fff; padding: 8px 14px; box-shadow: 0 2px 6px rgba(30,136,229,.25); }
         .topbar .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; max-width: 860px; margin: auto; }
         .topbar h1 { margin: 0; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 200px; min-width: 0; }
         .tools { display: flex; gap: 8px; flex-wrap: wrap; }
-        .tbtn { background: #fff; color: #303f46; border: none; border-radius: 4px; padding: 5px 12px; font-weight: bold; cursor: pointer; font-size: 13px; white-space: nowrap; }
-        .tbtn:hover { background: #eaeef0; }
+        .tbtn { background: #fff; color: #1565c0; border: none; border-radius: 4px; padding: 5px 12px; font-weight: bold; cursor: pointer; font-size: 13px; white-space: nowrap; }
+        .tbtn:hover { background: #e3f0fb; }
 
         main { max-width: 860px; margin: auto; padding: 14px; }
         mjx-container { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
@@ -23,19 +23,19 @@
         .txt { margin: 8px 0; }
 
         /* ---- tiêu đề ---- */
-        h2.hd1 { color: #303f46; border-bottom: 3px solid #d2dbe0; padding-bottom: 6px; margin: 30px 0 12px; font-size: 21px; }
-        h3.hd2 { color: #303f46; border-bottom: 2px solid #d2dbe0; padding-bottom: 4px; margin: 24px 0 10px; font-size: 18px; }
-        h4.hd3 { color: #1b2428; margin: 20px 0 8px; font-size: 16px; }
+        h2.hd1 { color: #1565c0; border-bottom: 3px solid #b3d4fc; padding-bottom: 6px; margin: 30px 0 12px; font-size: 21px; }
+        h3.hd2 { color: #1565c0; border-bottom: 2px solid #b3d4fc; padding-bottom: 4px; margin: 24px 0 10px; font-size: 18px; }
+        h4.hd3 { color: #0d47a1; margin: 20px 0 8px; font-size: 16px; }
         .hd { scroll-margin-top: 104px; }
 
         /* ---- khung lý thuyết ---- */
-        .box { border: 2px solid var(--bc, #d2dbe0); background: var(--bg, #f3f5f7); border-radius: 8px; margin: 12px 0; overflow: hidden; }
-        .box .bh { background: var(--bc, #d2dbe0); color: var(--fg, #1b2428); font-weight: bold; padding: 5px 12px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+        .box { border: 2px solid var(--bc, #b3d4fc); background: var(--bg, #eef6fc); border-radius: 8px; margin: 12px 0; overflow: hidden; }
+        .box .bh { background: var(--bc, #b3d4fc); color: var(--fg, #0d47a1); font-weight: bold; padding: 5px 12px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
         .box .bsub { font-weight: normal; }
         .box .bb { padding: 8px 14px; overflow-x: auto; }
         .box .box { margin: 8px 0; }
         .box .bb > .tp:first-child { margin-top: 2px; }
-        .k-def  { --bc: #d2dbe0; --bg: #f3f5f7; --fg: #1b2428; }
+        .k-def  { --bc: #b3d4fc; --bg: #eef6fc; --fg: #0d47a1; }
         .k-thm  { --bc: #c5b3f5; --bg: #f5f1fe; --fg: #3b1e8a; }
         .k-note { --bc: #ffe08a; --bg: #fffbea; --fg: #7a5600; }
         .k-warn { --bc: #ffb4a8; --bg: #fff3f0; --fg: #9a2410; }
@@ -45,24 +45,24 @@
         .k-ask  { --bc: #d5d5d5; --bg: #f7f7f7; --fg: #333; }
 
         /* ---- dạng toán ---- */
-        .dang { border: 2px solid #455a64; border-radius: 8px; margin: 22px 0 12px; background: #fff; overflow: hidden; scroll-margin-top: 104px; }
-        .dang .dh { background: #455a64; color: #fff; padding: 7px 14px; font-weight: bold; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
-        .dang .dno { background: #fff; color: #303f46; border-radius: 12px; padding: 0 10px; white-space: nowrap; }
+        .dang { border: 2px solid #1e88e5; border-radius: 8px; margin: 22px 0 12px; background: #fff; overflow: hidden; scroll-margin-top: 104px; }
+        .dang .dh { background: #1e88e5; color: #fff; padding: 7px 14px; font-weight: bold; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+        .dang .dno { background: #fff; color: #1565c0; border-radius: 12px; padding: 0 10px; white-space: nowrap; }
         .dang .db { padding: 8px 14px; overflow-x: auto; }
 
         /* ---- ví dụ / câu hỏi ---- */
-        .q { background: #fff; border: 2px solid #d2dbe0; border-radius: 8px; padding: 12px 14px; margin: 14px 0; overflow-x: auto; }
+        .q { background: #fff; border: 2px solid #b3d4fc; border-radius: 8px; padding: 12px 14px; margin: 14px 0; overflow-x: auto; }
         .q.s-correct { border-color: #28a745; }
         .q.s-wrong { border-color: #dc3545; }
         .q.s-partial { border-color: #ff9800; }
         .q .eh { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
-        .q .el { background: #455a64; color: #fff; font-weight: bold; padding: 2px 12px; border-radius: 14px; }
+        .q .el { background: #1e88e5; color: #fff; font-weight: bold; padding: 2px 12px; border-radius: 14px; }
         .q.ex .el { background: #00897b; }
-        .q .tag { font-size: 12px; color: #303f46; border: 1px solid #d2dbe0; border-radius: 10px; padding: 0 8px; background: #f3f5f7; }
+        .q .tag { font-size: 12px; color: #1565c0; border: 1px solid #b3d4fc; border-radius: 10px; padding: 0 8px; background: #eef6fc; }
         .qtext { margin-bottom: 8px; word-wrap: break-word; }
 
-        .opt { display: flex; gap: 8px; align-items: flex-start; background: #fff; border: 1px solid #d2dbe0; border-radius: 4px; padding: 8px 11px; margin: 6px 0; cursor: pointer; transition: .2s; }
-        .opt:hover:not(.locked):not(.static) { background: #eaeef0; border-color: #455a64; }
+        .opt { display: flex; gap: 8px; align-items: flex-start; background: #fff; border: 1px solid #b3d4fc; border-radius: 4px; padding: 8px 11px; margin: 6px 0; cursor: pointer; transition: .2s; }
+        .opt:hover:not(.locked):not(.static) { background: #e3f0fb; border-color: #1e88e5; }
         .opt:focus-visible, .tfb button:focus-visible { outline: 3px solid #ff9800; outline-offset: 1px; }
         .opt.static { cursor: default; }
         .opt.locked { cursor: default; }
@@ -72,19 +72,19 @@
         .lab { font-weight: bold; min-width: 1.7em; }
         .ob { flex: 1; min-width: 0; overflow-x: auto; }
 
-        .tfrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; background: #fff; border: 1px solid #d2dbe0; border-radius: 4px; padding: 7px 10px; margin: 6px 0; }
+        .tfrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; background: #fff; border: 1px solid #b3d4fc; border-radius: 4px; padding: 7px 10px; margin: 6px 0; }
         .tfrow.r-ok { border-color: #28a745; }
         .tfrow.r-bad { border-color: #dc3545; }
         .tfc { flex: 1 1 60%; min-width: 0; overflow-x: auto; }
         .tfb { display: flex; gap: 8px; }
-        .tfb button { padding: 6px 16px; font-weight: bold; border: 2px solid #d2dbe0; background: #fff; border-radius: 5px; cursor: pointer; }
-        .tfb button:hover:not(:disabled) { background: #eaeef0; }
+        .tfb button { padding: 6px 16px; font-weight: bold; border: 2px solid #b3d4fc; background: #fff; border-radius: 5px; cursor: pointer; }
+        .tfb button:hover:not(:disabled) { background: #e3f0fb; }
         .tfb button:disabled { cursor: default; }
         .tfb button.correct { background: #d4edda; border-color: #28a745; color: #155724; }
         .tfb button.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
 
         .shortrow { display: flex; gap: 8px; flex-wrap: wrap; }
-        .sans { width: 190px; max-width: 100%; padding: 8px 12px; font-size: 17px; font-weight: bold; border: 2px solid #455a64; border-radius: 5px; color: #303f46; }
+        .sans { width: 190px; max-width: 100%; padding: 8px 12px; font-size: 17px; font-weight: bold; border: 2px solid #1e88e5; border-radius: 5px; color: #1565c0; }
         .sans.correct { background: #d4edda; border-color: #28a745; color: #155724; }
         .sans.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
         .chk { background: #ffc107; border: none; border-radius: 5px; padding: 0 18px; font-weight: bold; cursor: pointer; min-height: 40px; }
@@ -96,18 +96,18 @@
         .qtools { margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap; }
         .sol-btn { background: #17a2b8; color: #fff; border: none; border-radius: 4px; padding: 6px 14px; cursor: pointer; font-weight: bold; }
         .sol-btn:hover { background: #138496; }
-        .redo-btn { background: #fff; color: #303f46; border: 1px solid #455a64; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-weight: bold; }
-        .solution-box { display: none; margin-top: 10px; padding: 12px 14px; background: #eef2f4; border-left: 5px solid #0288d1; border-radius: 4px; overflow-x: auto; }
+        .redo-btn { background: #fff; color: #1565c0; border: 1px solid #1e88e5; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-weight: bold; }
+        .solution-box { display: none; margin-top: 10px; padding: 12px 14px; background: #e8f4fc; border-left: 5px solid #0288d1; border-radius: 4px; overflow-x: auto; }
 
         /* ---- mục lục (ngăn kéo) ---- */
         .drawer { position: fixed; top: 0; bottom: 0; left: 0; width: min(360px, 88vw); z-index: 80; background: #fff; box-shadow: 4px 0 18px rgba(0,0,0,.25); transform: translateX(-105%); transition: transform .25s; display: flex; flex-direction: column; }
         .drawer.open { transform: none; }
-        .drawer .dtop { background: #455a64; color: #fff; padding: 10px 14px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .drawer .dtop { background: #1e88e5; color: #fff; padding: 10px 14px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         .drawer .dtop button { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
         .toc { overflow-y: auto; padding: 8px 6px 20px; }
         .toc a { display: block; padding: 5px 10px; color: #1c2b3a; text-decoration: none; border-radius: 4px; font-size: 14px; line-height: 1.4; }
-        .toc a:hover { background: #eaeef0; }
-        .toc a.l1 { font-weight: bold; color: #303f46; margin-top: 8px; }
+        .toc a:hover { background: #e3f0fb; }
+        .toc a.l1 { font-weight: bold; color: #1565c0; margin-top: 8px; }
         .toc a.l2 { padding-left: 18px; }
         .toc a.l3 { padding-left: 30px; font-size: 13px; }
         .toc a.l4 { padding-left: 30px; font-size: 13px; color: #00695c; }
@@ -121,11 +121,11 @@
         /* ---- góc dưới phải: [ℹ️ tác giả  ▶️ số điện thoại] + nút tròn lên đầu trang ---- */
         .fab { position: fixed; right: 14px; bottom: 14px; z-index: 40; display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 28px); pointer-events: none; }
         .fab > * { pointer-events: auto; }
-        .credit { display: flex; align-items: center; flex-wrap: wrap; gap: 0 12px; min-height: 42px; padding: 4px 14px; background: #fff; color: #303f46; border: 1px solid #d2dbe0; border-radius: 21px; font-size: 12px; line-height: 1.35; box-shadow: 0 2px 8px rgba(69,90,100,.18); min-width: 0; }
+        .credit { display: flex; align-items: center; flex-wrap: wrap; gap: 0 12px; min-height: 42px; padding: 4px 14px; background: #fff; color: #1565c0; border: 1px solid #b3d4fc; border-radius: 21px; font-size: 12px; line-height: 1.35; box-shadow: 0 2px 8px rgba(30,136,229,.18); min-width: 0; }
         .credit:empty { display: none; }
         .credit .cr-i { white-space: nowrap; }
         .credit .cr-i b { font-weight: bold; }
-        #toTop { flex: 0 0 42px; background: #455a64; color: #fff; border: none; border-radius: 50%; width: 42px; height: 42px; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+        #toTop { flex: 0 0 42px; background: #1e88e5; color: #fff; border: none; border-radius: 50%; width: 42px; height: 42px; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
 
 
         /* ---- tiến độ học tập (thanh trên cùng) ---- */
@@ -133,7 +133,7 @@
         .ptxt { font-weight: bold; white-space: nowrap; }
         .ptrack { flex: 1 1 90px; min-width: 70px; height: 8px; background: rgba(255,255,255,.35); border-radius: 4px; overflow: hidden; }
         .pfill { height: 100%; width: 0; background: #fff; transition: width .3s; }
-        .fsel { background: #fff; color: #303f46; border: none; border-radius: 4px; padding: 3px 6px; font-weight: bold; font-size: 13px; max-width: 100%; }
+        .fsel { background: #fff; color: #1565c0; border: none; border-radius: 4px; padding: 3px 6px; font-weight: bold; font-size: 13px; max-width: 100%; }
         .lswarn { background: #fff3cd; color: #7a5600; border-radius: 4px; padding: 0 8px; font-size: 12px; }
         .fltnote { margin: 4px 0 10px; padding: 6px 12px; background: #fff6ec; border: 1px solid #f5c18c; border-radius: 6px; color: #8a4a00; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
@@ -143,34 +143,34 @@
         .s-correct .stt { color: #155724; background: #d4edda; border-color: #28a745; }
         .s-partial .stt { color: #8a4a00; background: #fff3e0; border-color: #ff9800; }
         .s-wrong .stt { color: #721c24; background: #f8d7da; border-color: #dc3545; }
-        .tfb button.sel { background: #eaeef0; border-color: #455a64; color: #303f46; }
+        .tfb button.sel { background: #e3f0fb; border-color: #1e88e5; color: #1565c0; }
         .tf-chk { background: #ffc107; border: none; border-radius: 5px; padding: 0 18px; font-weight: bold; cursor: pointer; min-height: 40px; margin-top: 6px; }
         .tf-chk:disabled { background: #ccc; cursor: default; }
         .rv-btn { background: #fff; color: #8a4a00; border: 1px solid #f5c18c; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-weight: bold; }
         .rv-btn.on { background: #fff6ec; border-color: #ff9800; }
-        .rate { margin-top: 10px; padding: 8px 12px; background: #fafbfc; border: 1px dashed #d2dbe0; border-radius: 6px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .rate .rq { font-weight: bold; color: #303f46; margin-right: 4px; }
-        .rb { border: 2px solid #d2dbe0; background: #fff; border-radius: 5px; padding: 5px 14px; font-weight: bold; cursor: pointer; }
-        .rb:hover { background: #eaeef0; }
+        .rate { margin-top: 10px; padding: 8px 12px; background: #f7fbff; border: 1px dashed #b3d4fc; border-radius: 6px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .rate .rq { font-weight: bold; color: #1565c0; margin-right: 4px; }
+        .rb { border: 2px solid #b3d4fc; background: #fff; border-radius: 5px; padding: 5px 14px; font-weight: bold; cursor: pointer; }
+        .rb:hover { background: #e3f0fb; }
         .rb.ok.on { background: #d4edda; border-color: #28a745; color: #155724; }
         .rb.near.on { background: #fff3e0; border-color: #ff9800; color: #8a4a00; }
         .rb.no.on { background: #f8d7da; border-color: #dc3545; color: #721c24; }
 
         /* ---- tổng kết ---- */
-        .dsum { margin-top: 10px; padding: 6px 12px; background: #f3f5f7; border: 1px solid #d2dbe0; border-radius: 6px; font-size: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .dsum { margin-top: 10px; padding: 6px 12px; background: #eef6fc; border: 1px solid #b3d4fc; border-radius: 6px; font-size: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .dsum:empty { display: none; }
-        .dbtn { background: #fff; color: #303f46; border: 1px solid #455a64; border-radius: 4px; padding: 3px 10px; cursor: pointer; font-weight: bold; }
+        .dbtn { background: #fff; color: #1565c0; border: 1px solid #1e88e5; border-radius: 4px; padding: 3px 10px; cursor: pointer; font-weight: bold; }
         .dbtn:disabled { color: #999; border-color: #ccc; cursor: default; }
         .sumsec { margin: 34px 0 10px; scroll-margin-top: 104px; }
-        .sumsec .sline { font-weight: bold; color: #1b2428; }
+        .sumsec .sline { font-weight: bold; color: #0d47a1; }
         .sgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; margin: 10px 0 14px; }
-        .scard { background: #fff; border: 2px solid #d2dbe0; border-radius: 8px; padding: 8px 10px; text-align: center; }
-        .scard b { display: block; font-size: 22px; color: #303f46; }
+        .scard { background: #fff; border: 2px solid #b3d4fc; border-radius: 8px; padding: 8px 10px; text-align: center; }
+        .scard b { display: block; font-size: 22px; color: #1565c0; }
         .scard span { font-size: 12px; color: #5f7b94; }
         .swrap { overflow-x: auto; }
         .stab { border-collapse: collapse; width: 100%; background: #fff; }
-        .stab th, .stab td { border: 1px solid #d2dbe0; padding: 5px 10px; text-align: center; }
-        .stab th { background: #eef2f4; color: #1b2428; }
+        .stab th, .stab td { border: 1px solid #b3d4fc; padding: 5px 10px; text-align: center; }
+        .stab th { background: #e8f4fc; color: #0d47a1; }
         .stab td:first-child { text-align: left; }
         .skind { margin: 6px 0; padding-left: 20px; }
         .sbtns { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 6px; }
@@ -179,8 +179,8 @@
 
         /* --- SVG / ẢNH + KHUNG ZOOM DÙNG CHUNG (khung tự co giãn, không đặt chiều cao cố định) --- */
         :root {
-            --zoom-accent: #455a64; --zoom-accent-hover: #303f46;
-            --zoom-border: #d2dbe0; --zoom-bar-bg: #f3f5f7; --zoom-max-h: none;
+            --zoom-accent: #1e88e5; --zoom-accent-hover: #1565c0;
+            --zoom-border: #b3d4fc; --zoom-bar-bg: #eef6fc; --zoom-max-h: none;
         }
         svg { max-width: 100%; height: auto; display: block; margin: 10px auto; overflow: visible; }
         svg text { font-family: Arial, sans-serif; }
@@ -236,7 +236,7 @@
         .lvl { display: inline-block; margin-left: 8px; padding: 1px 10px; border-radius: 12px; border: 1px solid; font-size: 12px; font-weight: bold; line-height: 1.6; white-space: nowrap; vertical-align: middle; cursor: help; }
         .lvl .dots { letter-spacing: 1px; margin-right: 4px; }
         .lvl.lv1 { background: #e6f4ea; border-color: #34a853; color: #1b6b32; }
-        .lvl.lv2 { background: #eaeef0; border-color: #4a90d9; color: #1b2428; }
+        .lvl.lv2 { background: #e3f0fb; border-color: #4a90d9; color: #0d47a1; }
         .lvl.lv3 { background: #fff3e0; border-color: #fb8c00; color: #8a4b00; }
         .lvl.lv4 { background: #fdeaea; border-color: #e53935; color: #a31515; }
         .figure svg, .figure img { max-width: 100%; height: auto; }
@@ -285,13 +285,13 @@
 .lz-lock { position: fixed; inset: 0; z-index: 100000; display: none; align-items: center; justify-content: center; padding: 14px; background: rgba(0,0,0,.5); }
 .lz-lock.open { display: flex; }
 .lz-lock-box { background: #fff; color: #1c2b3a; width: 100%; max-width: 360px; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.35); font-family: Arial, sans-serif; }
-.lz-lock-box h4 { margin: 0 0 6px; color: #303f46; font-size: 18px; }
+.lz-lock-box h4 { margin: 0 0 6px; color: #1565c0; font-size: 18px; }
 .lz-lock-box p { margin: 0 0 12px; font-size: 14px; color: #555; }
-.lz-lock-box input { width: 100%; box-sizing: border-box; padding: 10px; font-size: 16px; border: 2px solid #455a64; border-radius: 6px; }
+.lz-lock-box input { width: 100%; box-sizing: border-box; padding: 10px; font-size: 16px; border: 2px solid #1e88e5; border-radius: 6px; }
 .lz-lock-box input.bad { border-color: #dc3545; animation: lzshake .3s; }
 .lz-lock-err { min-height: 1.3em; margin: 6px 0 2px; font-size: 13px; color: #dc3545; font-weight: bold; }
 .lz-lock-btns { display: flex; gap: 8px; margin-top: 8px; }
-.lz-lock-btns button { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; color: #fff; background: #455a64; }
+.lz-lock-btns button { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; color: #fff; background: #1e88e5; }
 .lz-lock-btns button.cancel { background: #6c757d; }
 @keyframes lzshake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 </style>
@@ -321,22 +321,7 @@
     <div class="veil" id="veil"></div>
     <aside class="drawer" id="drawer" aria-label="Mục lục">
         <div class="dtop"><span>Mục lục</span><button type="button" id="btnTocClose" aria-label="Đóng">✕</button></div>
-        <nav class="toc" id="toc"><a class="l2" href="#h1">Bài tập và các dạng toán</a><a class="l4" href="#d1">Dạng 1. Đưa về so sánh với tổng các phân số cùng tử và cùng mẫu</a><a class="l4" href="#d2">Dạng 2. Vận dụng tính tổng theo quy luật rồi so sánh</a><a class="l4" href="#d3">Dạng 3. Tính tích các thừa số theo quy luật rồi so sánh</a><a class="l4" href="#d4">Dạng 4. Dùng đánh giá đưa về dạng tính tổng theo quy luật để rút gọn</a><a class="l4" href="#d5">Dạng 5. Đánh giá so sánh qua các số (phân số) trung gian</a><a class="l4" href="#d6">Dạng 6. Bài toán vận dụng tính chất $ n!=1\cdot 2\cdot 3\cdots (n-1)\cdot n, \forall n \in \mathbb {N^*],n \geq 2 $.<br>Cho $ M=\dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{8}{9!}+\dfrac{9}{10!}$. So sánh $ M $ với $ 1 $.<br>Ta có \begin{align*}
-			M&amp;=  \dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{8}{9!}+\dfrac{9}{10!}\\
-			&amp;=  \dfrac{2-1}{2!}+\dfrac{3-1}{3!}+\dfrac{4-1}{4!}+\cdots+\dfrac{9-1}{9!}+\dfrac{10-1}{10!}\\
-			&amp;=  \left(1-\dfrac{1}{2!}\right) +\left(\dfrac{1}{2!}-\dfrac{1}{3!}\right) +\left(\dfrac{1}{3!}-\dfrac{1}{4!}\right)+\cdots+ +\left(\dfrac{1}{8!}-\dfrac{1}{9!}\right) +\left(\dfrac{1}{9!}-\dfrac{1}{10!}\right)=1-\dfrac{1}{10!}.
-		\end{align*} Vì $ 0&lt;\dfrac{1}{10!}&lt;1 $ nên $ M&lt;1 $.<br>Biết $ n!=1\cdot 2\cdot 3\cdots (n-1)\cdot n,\forall n \in \mathbb {N^*},n \geq 2 $. Chứng minh rằng \[M=\dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{2018}{2019!}+\dfrac{2019}{2020!}&lt;1.\]<br>Ta có \begin{align*}
-			M&amp;= \dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{2018}{2019!}+\dfrac{2019}{2020!}\\
-			&amp;= \dfrac{2-1}{2!}+\dfrac{3-1}{3!}+\dfrac{4-1}{4!}+\cdots+\dfrac{2019-1}{2019!}+\dfrac{2020-1}{2020!}\\
-			&amp;=  \dfrac{2}{2!}-\dfrac{1}{2!}+\dfrac{3}{3!}-\dfrac{1}{3!}+\dfrac{4}{4!}-\dfrac{1}{4!}+\cdots+\dfrac{2019}{2019!}-\dfrac{1}{2019!}+\dfrac{2020}{2020!}-\dfrac{1}{2020!}\\
-			&amp;=  1- \dfrac{1}{1\cdot 2}+\dfrac{3}{1\cdot 2\cdot 3}-\dfrac{1}{1\cdot 2\cdot 3}+\dfrac{4}{1\cdot 2\cdot 3\cdot 4}-\dfrac{1}{1\cdot 2\cdot 3\cdot 4}+\cdots+\dfrac{2020}{1\cdot 2\cdot 3\cdots 2020}-\dfrac{1}{1\cdot 2\cdot 3\cdots 2020}\\
-			&amp;=  1- \dfrac{1}{2}+\dfrac{1}{2}-\dfrac{1}{1\cdot 2\cdot 3}+\dfrac{1}{1\cdot 2\cdot 3}-\dfrac{1}{2\cdot 3\cdot 4}+\cdots+\dfrac{1}{1\cdot 2\cdot 3\cdots 2019}-\dfrac{1}{1\cdot 2\cdot 3\cdots 2019}=1-\dfrac{1}{2020!}&lt;1.
-		\end{align*} Vậy $ M&lt;1 $.<br>Chứng minh rằng $ P=\dfrac{2!}{3!}+\dfrac{2!}{4!}+\dfrac{2!}{5!}+\cdots+\dfrac{2!}{n!}&lt;1 $.<br>Ta có \begin{align*}
-			P&amp;=\dfrac{2!}{3!}+\dfrac{2!}{4!}+\dfrac{2!}{5!}+\cdots+\dfrac{2!}{n!}=2!\left(\dfrac{1!}{3!}+\dfrac{1!}{4!}+\dfrac{1!}{5!}+\cdots+\dfrac{1!}{n!}\right) \\
-			&amp;=2!\left(\dfrac{1}{1\cdot 2\cdot 3}+\dfrac{1}{2\cdot 3\cdot 4}+\dfrac{1}{3\cdot 4\cdot 5}+\cdots+\dfrac{1}{(n-2)\cdot (n-1)\cdot n} \right) \\
-			\Rightarrow P&amp;&lt;2 \left(\dfrac{1}{2\cdot 3}+\dfrac{1}{3\cdot 4}+\dfrac{1}{4\cdot 5}+\cdots+ \dfrac{1}{(n-1)\cdot n}\right) \\
-			\Rightarrow P&amp;&lt;2 \left(\dfrac{1}{2}-\dfrac{1}{n}\right) =1-\dfrac{2}{n}&lt;1.
-		\end{align*} Vậy $ P=\dfrac{2!}{3!}+\dfrac{2!}{4!}+\dfrac{2!}{5!}+\cdots+\dfrac{2!}{n!}&lt;1 $.<br>[n</a><a class="l2" href="#h2">Một số bài tập tự luyện</a></nav>
+        <nav class="toc" id="toc"><a class="l2" href="#h1">Bài tập và các dạng toán</a><a class="l4" href="#d1">Dạng 1. Đưa về so sánh với tổng các phân số cùng tử và cùng mẫu</a><a class="l4" href="#d2">Dạng 2. Vận dụng tính tổng theo quy luật rồi so sánh</a><a class="l4" href="#d3">Dạng 3. Tính tích các thừa số theo quy luật rồi so sánh</a><a class="l4" href="#d4">Dạng 4. Dùng đánh giá đưa về dạng tính tổng theo quy luật để rút gọn</a><a class="l4" href="#d5">Dạng 5. Đánh giá so sánh qua các số (phân số) trung gian</a><a class="l2" href="#h2">Một số bài tập tự luyện</a></nav>
     </aside>
 
     <main id="content">
@@ -611,37 +596,12 @@
 		\end{align*} Từ $ (1),(2) $ suy ra điều phải chứng minh.</div></div></div></div><div class="lz"><div class="q ex" id="ex59" data-kind="essay"><div class="eh"><span class="el">Câu 59</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ S=\dfrac{5}{20}+\dfrac{5}{21}+\dfrac{5}{22}+\cdots+\dfrac{5}{49} $. Chứng minh rằng $ 3&lt;S&lt;8 $.</div></div><div class="qtools"><button type="button" class="sol-btn">Xem lời giải</button></div><div class="solution-box tex2jax_ignore"><div class="tp"><b>Lời giải.</b> Xét tổng $ S=\dfrac{5}{20}+\dfrac{5}{21}+\dfrac{5}{22}+\cdots+\dfrac{5}{49} $ có $ 30 $ số hạng. Ta nhận thấy \[\dfrac{5}{20}&gt;\dfrac{5}{50};\dfrac{5}{21}&gt;\dfrac{5}{50};\dfrac{5}{22}&gt;\dfrac{5}{50};\ldots;\dfrac{5}{49}&gt;\dfrac{5}{50}\Rightarrow S&gt;30\cdot &gt;\dfrac{5}{50}\Rightarrow S&gt;3.\tag{1} \] Lại có \[\dfrac{5}{20}=\dfrac{5}{20};\dfrac{5}{21}&lt;\dfrac{5}{20};\dfrac{5}{22}&lt;\dfrac{5}{20};\ldots;\dfrac{5}{49}&lt;\dfrac{5}{20}\Rightarrow S&lt;30\cdot \dfrac{5}{20}\Rightarrow S&lt;8.\tag{2}\] Từ $ (1),(2) $ ta suy ra điều phải chứng minh.</div></div></div></div><div class="lz"><div class="q ex" id="ex60" data-kind="essay"><div class="eh"><span class="el">Câu 60</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">So sánh $ M=\dfrac{-7}{10^{2019}}+\dfrac{-15}{10^{2020}}$ và $ N=\dfrac{-15}{10^{2019}} +\dfrac{-7}{10^{2020}}$.</div></div><div class="qtools"><button type="button" class="sol-btn">Xem lời giải</button></div><div class="solution-box tex2jax_ignore"><div class="tp"><b>Lời giải.</b> Ta có \begin{align*}
 			M=\dfrac{-7}{10^{2019}}+\dfrac{-15}{10^{2020}}=\dfrac{-7}{10^{2019}}+\dfrac{-7}{10^{2020}}+\dfrac{-8}{10^{2020}}.\\
 			N=\dfrac{-15}{10^{2019}} +\dfrac{-7}{10^{2020}}=\dfrac{-7}{10^{2019}}+\dfrac{-8}{10^{2019}} +\dfrac{-7}{10^{2020}}.
-		\end{align*} Nhận thấy $ \dfrac{-8}{10^{2020}}&lt;\dfrac{-8}{10^{2019}} $ nên suy ra $ M&lt;N $.</div></div></div></div><div class="lz"><div class="dang" id="d6"><div class="dh"><span class="dno">Dạng 6</span><span class="dtt">Bài toán vận dụng tính chất $ n!=1\cdot 2\cdot 3\cdots (n-1)\cdot n, \forall n \in \mathbb {N^*],n \geq 2 $.<br>Cho $ M=\dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{8}{9!}+\dfrac{9}{10!}$. So sánh $ M $ với $ 1 $.<br>Ta có \begin{align*}
-			M&amp;=  \dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{8}{9!}+\dfrac{9}{10!}\\
-			&amp;=  \dfrac{2-1}{2!}+\dfrac{3-1}{3!}+\dfrac{4-1}{4!}+\cdots+\dfrac{9-1}{9!}+\dfrac{10-1}{10!}\\
-			&amp;=  \left(1-\dfrac{1}{2!}\right) +\left(\dfrac{1}{2!}-\dfrac{1}{3!}\right) +\left(\dfrac{1}{3!}-\dfrac{1}{4!}\right)+\cdots+ +\left(\dfrac{1}{8!}-\dfrac{1}{9!}\right) +\left(\dfrac{1}{9!}-\dfrac{1}{10!}\right)=1-\dfrac{1}{10!}.
-		\end{align*} Vì $ 0&lt;\dfrac{1}{10!}&lt;1 $ nên $ M&lt;1 $.<br>Biết $ n!=1\cdot 2\cdot 3\cdots (n-1)\cdot n,\forall n \in \mathbb {N^*},n \geq 2 $. Chứng minh rằng \[M=\dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{2018}{2019!}+\dfrac{2019}{2020!}&lt;1.\]<br>Ta có \begin{align*}
-			M&amp;= \dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{2018}{2019!}+\dfrac{2019}{2020!}\\
-			&amp;= \dfrac{2-1}{2!}+\dfrac{3-1}{3!}+\dfrac{4-1}{4!}+\cdots+\dfrac{2019-1}{2019!}+\dfrac{2020-1}{2020!}\\
-			&amp;=  \dfrac{2}{2!}-\dfrac{1}{2!}+\dfrac{3}{3!}-\dfrac{1}{3!}+\dfrac{4}{4!}-\dfrac{1}{4!}+\cdots+\dfrac{2019}{2019!}-\dfrac{1}{2019!}+\dfrac{2020}{2020!}-\dfrac{1}{2020!}\\
-			&amp;=  1- \dfrac{1}{1\cdot 2}+\dfrac{3}{1\cdot 2\cdot 3}-\dfrac{1}{1\cdot 2\cdot 3}+\dfrac{4}{1\cdot 2\cdot 3\cdot 4}-\dfrac{1}{1\cdot 2\cdot 3\cdot 4}+\cdots+\dfrac{2020}{1\cdot 2\cdot 3\cdots 2020}-\dfrac{1}{1\cdot 2\cdot 3\cdots 2020}\\
-			&amp;=  1- \dfrac{1}{2}+\dfrac{1}{2}-\dfrac{1}{1\cdot 2\cdot 3}+\dfrac{1}{1\cdot 2\cdot 3}-\dfrac{1}{2\cdot 3\cdot 4}+\cdots+\dfrac{1}{1\cdot 2\cdot 3\cdots 2019}-\dfrac{1}{1\cdot 2\cdot 3\cdots 2019}=1-\dfrac{1}{2020!}&lt;1.
-		\end{align*} Vậy $ M&lt;1 $.<br>Chứng minh rằng $ P=\dfrac{2!}{3!}+\dfrac{2!}{4!}+\dfrac{2!}{5!}+\cdots+\dfrac{2!}{n!}&lt;1 $.<br>Ta có \begin{align*}
+		\end{align*} Nhận thấy $ \dfrac{-8}{10^{2020}}&lt;\dfrac{-8}{10^{2019}} $ nên suy ra $ M&lt;N $.</div></div></div></div><div class="lz"><div class="q ex" id="ex61" data-kind="essay"><div class="eh"><span class="el">Câu 61</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Chứng minh rằng $ P=\dfrac{2!}{3!}+\dfrac{2!}{4!}+\dfrac{2!}{5!}+\cdots+\dfrac{2!}{n!}&lt;1 $.</div></div><div class="qtools"><button type="button" class="sol-btn">Xem lời giải</button></div><div class="solution-box tex2jax_ignore"><div class="tp"><b>Lời giải.</b> Ta có \begin{align*}
 			P&amp;=\dfrac{2!}{3!}+\dfrac{2!}{4!}+\dfrac{2!}{5!}+\cdots+\dfrac{2!}{n!}=2!\left(\dfrac{1!}{3!}+\dfrac{1!}{4!}+\dfrac{1!}{5!}+\cdots+\dfrac{1!}{n!}\right) \\
 			&amp;=2!\left(\dfrac{1}{1\cdot 2\cdot 3}+\dfrac{1}{2\cdot 3\cdot 4}+\dfrac{1}{3\cdot 4\cdot 5}+\cdots+\dfrac{1}{(n-2)\cdot (n-1)\cdot n} \right) \\
 			\Rightarrow P&amp;&lt;2 \left(\dfrac{1}{2\cdot 3}+\dfrac{1}{3\cdot 4}+\dfrac{1}{4\cdot 5}+\cdots+ \dfrac{1}{(n-1)\cdot n}\right) \\
 			\Rightarrow P&amp;&lt;2 \left(\dfrac{1}{2}-\dfrac{1}{n}\right) =1-\dfrac{2}{n}&lt;1.
-		\end{align*} Vậy $ P=\dfrac{2!}{3!}+\dfrac{2!}{4!}+\dfrac{2!}{5!}+\cdots+\dfrac{2!}{n!}&lt;1 $.<br>[n</span></div><div class="db"></div></div></div><div class="lz"><div class="q ex" id="ex61" data-kind="essay"><div class="eh"><span class="el">Câu 61</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ M=\dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{8}{9!}+\dfrac{9}{10!}$. So sánh $ M $ với $ 1 $.</div></div><div class="qtools"><button type="button" class="sol-btn">Xem lời giải</button></div><div class="solution-box tex2jax_ignore"><div class="tp"><b>Lời giải.</b> Ta có \begin{align*}
-			M&amp;=  \dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{8}{9!}+\dfrac{9}{10!}\\
-			&amp;=  \dfrac{2-1}{2!}+\dfrac{3-1}{3!}+\dfrac{4-1}{4!}+\cdots+\dfrac{9-1}{9!}+\dfrac{10-1}{10!}\\
-			&amp;=  \left(1-\dfrac{1}{2!}\right) +\left(\dfrac{1}{2!}-\dfrac{1}{3!}\right) +\left(\dfrac{1}{3!}-\dfrac{1}{4!}\right)+\cdots+ +\left(\dfrac{1}{8!}-\dfrac{1}{9!}\right) +\left(\dfrac{1}{9!}-\dfrac{1}{10!}\right)=1-\dfrac{1}{10!}.
-		\end{align*} Vì $ 0&lt;\dfrac{1}{10!}&lt;1 $ nên $ M&lt;1 $.</div></div></div></div><div class="lz"><div class="q ex" id="ex62" data-kind="essay"><div class="eh"><span class="el">Câu 62</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Biết $ n!=1\cdot 2\cdot 3\cdots (n-1)\cdot n,\forall n \in \mathbb {N^*},n \geq 2 $. Chứng minh rằng \[M=\dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{2018}{2019!}+\dfrac{2019}{2020!}&lt;1.\]</div></div><div class="qtools"><button type="button" class="sol-btn">Xem lời giải</button></div><div class="solution-box tex2jax_ignore"><div class="tp"><b>Lời giải.</b> Ta có \begin{align*}
-			M&amp;= \dfrac{1}{2!}+\dfrac{2}{3!}+\dfrac{3}{4!}+\cdots+\dfrac{2018}{2019!}+\dfrac{2019}{2020!}\\
-			&amp;= \dfrac{2-1}{2!}+\dfrac{3-1}{3!}+\dfrac{4-1}{4!}+\cdots+\dfrac{2019-1}{2019!}+\dfrac{2020-1}{2020!}\\
-			&amp;=  \dfrac{2}{2!}-\dfrac{1}{2!}+\dfrac{3}{3!}-\dfrac{1}{3!}+\dfrac{4}{4!}-\dfrac{1}{4!}+\cdots+\dfrac{2019}{2019!}-\dfrac{1}{2019!}+\dfrac{2020}{2020!}-\dfrac{1}{2020!}\\
-			&amp;=  1- \dfrac{1}{1\cdot 2}+\dfrac{3}{1\cdot 2\cdot 3}-\dfrac{1}{1\cdot 2\cdot 3}+\dfrac{4}{1\cdot 2\cdot 3\cdot 4}-\dfrac{1}{1\cdot 2\cdot 3\cdot 4}+\cdots+\dfrac{2020}{1\cdot 2\cdot 3\cdots 2020}-\dfrac{1}{1\cdot 2\cdot 3\cdots 2020}\\
-			&amp;=  1- \dfrac{1}{2}+\dfrac{1}{2}-\dfrac{1}{1\cdot 2\cdot 3}+\dfrac{1}{1\cdot 2\cdot 3}-\dfrac{1}{2\cdot 3\cdot 4}+\cdots+\dfrac{1}{1\cdot 2\cdot 3\cdots 2019}-\dfrac{1}{1\cdot 2\cdot 3\cdots 2019}=1-\dfrac{1}{2020!}&lt;1.
-		\end{align*} Vậy $ M&lt;1 $.</div></div></div></div><div class="lz"><div class="q ex" id="ex63" data-kind="essay"><div class="eh"><span class="el">Câu 63</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Chứng minh rằng $ P=\dfrac{2!}{3!}+\dfrac{2!}{4!}+\dfrac{2!}{5!}+\cdots+\dfrac{2!}{n!}&lt;1 $.</div></div><div class="qtools"><button type="button" class="sol-btn">Xem lời giải</button></div><div class="solution-box tex2jax_ignore"><div class="tp"><b>Lời giải.</b> Ta có \begin{align*}
-			P&amp;=\dfrac{2!}{3!}+\dfrac{2!}{4!}+\dfrac{2!}{5!}+\cdots+\dfrac{2!}{n!}=2!\left(\dfrac{1!}{3!}+\dfrac{1!}{4!}+\dfrac{1!}{5!}+\cdots+\dfrac{1!}{n!}\right) \\
-			&amp;=2!\left(\dfrac{1}{1\cdot 2\cdot 3}+\dfrac{1}{2\cdot 3\cdot 4}+\dfrac{1}{3\cdot 4\cdot 5}+\cdots+\dfrac{1}{(n-2)\cdot (n-1)\cdot n} \right) \\
-			\Rightarrow P&amp;&lt;2 \left(\dfrac{1}{2\cdot 3}+\dfrac{1}{3\cdot 4}+\dfrac{1}{4\cdot 5}+\cdots+ \dfrac{1}{(n-1)\cdot n}\right) \\
-			\Rightarrow P&amp;&lt;2 \left(\dfrac{1}{2}-\dfrac{1}{n}\right) =1-\dfrac{2}{n}&lt;1.
-		\end{align*} Vậy $ P=\dfrac{2!}{3!}+\dfrac{2!}{4!}+\dfrac{2!}{5!}+\cdots+\dfrac{2!}{n!}&lt;1 $.</div></div></div></div><div class="lz"><div class="q ex" id="ex64" data-kind="essay"><div class="eh"><span class="el">Câu 64</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho biểu thức $ D=\dfrac{\left(2!\right)^2}{1^2}+\dfrac{\left(2!\right)^2}{3^2} + \dfrac{\left(2!\right)^2}{5^2}+\dfrac{\left(2!\right)^2}{7^2}+\cdots+\dfrac{\left(2!\right)^2}{2015^2} $. So sánh $ D $ với $ 6 $, biết $ n!=1\cdot 2\cdot 3\cdots (n-1)\cdot n $.</div></div><div class="qtools"><button type="button" class="sol-btn">Xem lời giải</button></div><div class="solution-box tex2jax_ignore"><div class="tp"><b>Lời giải.</b> Ta có \begin{align*}
+		\end{align*} Vậy $ P=\dfrac{2!}{3!}+\dfrac{2!}{4!}+\dfrac{2!}{5!}+\cdots+\dfrac{2!}{n!}&lt;1 $.</div></div></div></div><div class="lz"><div class="q ex" id="ex62" data-kind="essay"><div class="eh"><span class="el">Câu 62</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho biểu thức $ D=\dfrac{\left(2!\right)^2}{1^2}+\dfrac{\left(2!\right)^2}{3^2} + \dfrac{\left(2!\right)^2}{5^2}+\dfrac{\left(2!\right)^2}{7^2}+\cdots+\dfrac{\left(2!\right)^2}{2015^2} $. So sánh $ D $ với $ 6 $, biết $ n!=1\cdot 2\cdot 3\cdots (n-1)\cdot n $.</div></div><div class="qtools"><button type="button" class="sol-btn">Xem lời giải</button></div><div class="solution-box tex2jax_ignore"><div class="tp"><b>Lời giải.</b> Ta có \begin{align*}
 			D&amp;= \dfrac{\left(2!\right)^2}{1^2}+\dfrac{\left(2!\right)^2}{3^2} + \dfrac{\left(2!\right)^2}{5^2}+\dfrac{\left(2!\right)^2}{7^2}+\cdots+\dfrac{\left(2!\right)^2}{2015^2}\\
 			&amp;=  \dfrac{2^2}{1^2}+\dfrac{2^2}{3^2} + \dfrac{2^2}{5^2}+\dfrac{2^2}{7^2}+\cdots+\dfrac{2^2}{2015^2}\\
 			&amp;= 4+2\left(\dfrac{2}{3^2} + \dfrac{2}{5^2}+\dfrac{2}{7^2}+\cdots+\dfrac{2}{2015^2}\right).
@@ -653,7 +613,7 @@
 		\end{align*} Khi đó ta có \begin{align*}
 			D&amp;&lt;4+2\left(1-\dfrac{1}{3}+\dfrac{1}{3}-\dfrac{1}{5}+\cdots+\dfrac{1}{2013}-\dfrac{1}{2015}\right) \\
 			&amp;&lt;4+2\left(1-\dfrac{1}{2015}\right)=4+2-\dfrac{2}{2015}=6.
-		\end{align*} Vậy $ D&lt;6 $.</div></div></div></div><div class="lz"><h3 class="hd hd2" id="h2">Một số bài tập tự luyện</h3></div><div class="lz"><div class="q ex" id="ex65" data-kind="essay"><div class="eh"><span class="el">Câu 65</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ A=\dfrac{8}{9}+\dfrac{24}{25}+\dfrac{48}{49}+\cdots+\dfrac{200\cdot 202}{201^2} $. Chứng minh $ B&lt;99{,}75 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex66" data-kind="essay"><div class="eh"><span class="el">Câu 66</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ B=\dfrac{11}{9}+\dfrac{18}{16}+\dfrac{27}{25}+\cdots+\dfrac{1766}{1764} $. Chứng minh $ 40\dfrac{20}{43}&lt;A&lt;40\dfrac{20}{21} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex67" data-kind="essay"><div class="eh"><span class="el">Câu 67</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ C=\dfrac{2^2}{1\cdot 3}+\dfrac{3^2}{2\cdot 4}+\dfrac{4^2}{3\cdot 5}+\dfrac{5^2}{4\cdot 6}+\cdots+ \dfrac{99^2}{98\cdot 100} $. Tìm phần nguyên của $ C $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex68" data-kind="essay"><div class="eh"><span class="el">Câu 68</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ D=\dfrac{3}{4}+\dfrac{8}{9}+\dfrac{15}{16}+\cdots+\dfrac{2499}{2500} $. Chứng minh $ D&gt;48 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex69" data-kind="essay"><div class="eh"><span class="el">Câu 69</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ E=\dfrac{2}{3}+\dfrac{8}{9}+\dfrac{26}{27}+\cdots+\dfrac{3^n-1}{3^n} $. Chứng minh $ E&gt;n-\dfrac{1}{2} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex70" data-kind="essay"><div class="eh"><span class="el">Câu 70</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ F=\dfrac{4}{3}+\dfrac{10}{9}+\dfrac{28}{27}+\cdots+\dfrac{3^{98}+1}{3^98} $. Chứng minh $ F&lt;100 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex71" data-kind="essay"><div class="eh"><span class="el">Câu 71</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ G=\dfrac{5}{4}+\dfrac{5}{4^2}+\dfrac{5}{4^3}+\cdots+\dfrac{5}{4^{99}} $. Chứng minh $ G&lt;\dfrac{5}{3} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex72" data-kind="essay"><div class="eh"><span class="el">Câu 72</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ H=\dfrac{3}{1^2\cdot 2^2}+ \dfrac{5}{2^2\cdot 3^2}+\dfrac{7}{3^2\cdot 4^2}+\cdots+\dfrac{19}{9^2\cdot 10^2} $. Chứng minh $ H&lt;1 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex73" data-kind="essay"><div class="eh"><span class="el">Câu 73</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $I=\dfrac{1}{3}+\dfrac{2}{3^2}+\dfrac{3}{3^3}+\cdots+\dfrac{100}{3^{100}} $. Chứng minh $ E&lt;\dfrac{3}{4} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex74" data-kind="essay"><div class="eh"><span class="el">Câu 74</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $K=\dfrac{4}{3}+\dfrac{7}{3^2}+\dfrac{10}{3^3}+\cdots+\dfrac{3n+1}{3^{n}} $ với $ n\in \mathbb {N^*} $. Chứng minh $ K&lt;\dfrac{11}{4} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex75" data-kind="essay"><div class="eh"><span class="el">Câu 75</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ L=\dfrac{5}{3}+\dfrac{8}{3^2}+\dfrac{11}{3^3}+\cdots+\dfrac{302}{3^{100}} $. Chứng minh $ 2\dfrac{5}{9}&lt;L&lt;3\dfrac{1}{2} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex76" data-kind="essay"><div class="eh"><span class="el">Câu 76</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ M=\dfrac{7}{3}+\dfrac{13}{3^2}+\dfrac{19}{3^3}+\cdots+\dfrac{601}{3^{100}} $. Chứng minh $ 3\dfrac{7}{9}&lt;M&lt;5 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex77" data-kind="essay"><div class="eh"><span class="el">Câu 77</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ N=\dfrac{11}{3}+\dfrac{17}{3^2}+\dfrac{23}{3^3}+\cdots+\dfrac{605}{3^{100}} $. Chứng minh $ N&lt;7 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex78" data-kind="essay"><div class="eh"><span class="el">Câu 78</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $P=\dfrac{4}{3}+\dfrac{13}{3^2}+\dfrac{22}{3^3}+\cdots+\dfrac{904}{3^{100}} $. Chứng minh $ P&lt;\dfrac{17}{4} $.</div></div><div class="qtools"></div></div></div>
+		\end{align*} Vậy $ D&lt;6 $.</div></div></div></div><div class="lz"><h3 class="hd hd2" id="h2">Một số bài tập tự luyện</h3></div><div class="lz"><div class="q ex" id="ex63" data-kind="essay"><div class="eh"><span class="el">Câu 63</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ A=\dfrac{8}{9}+\dfrac{24}{25}+\dfrac{48}{49}+\cdots+\dfrac{200\cdot 202}{201^2} $. Chứng minh $ B&lt;99{,}75 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex64" data-kind="essay"><div class="eh"><span class="el">Câu 64</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ B=\dfrac{11}{9}+\dfrac{18}{16}+\dfrac{27}{25}+\cdots+\dfrac{1766}{1764} $. Chứng minh $ 40\dfrac{20}{43}&lt;A&lt;40\dfrac{20}{21} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex65" data-kind="essay"><div class="eh"><span class="el">Câu 65</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ C=\dfrac{2^2}{1\cdot 3}+\dfrac{3^2}{2\cdot 4}+\dfrac{4^2}{3\cdot 5}+\dfrac{5^2}{4\cdot 6}+\cdots+ \dfrac{99^2}{98\cdot 100} $. Tìm phần nguyên của $ C $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex66" data-kind="essay"><div class="eh"><span class="el">Câu 66</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ D=\dfrac{3}{4}+\dfrac{8}{9}+\dfrac{15}{16}+\cdots+\dfrac{2499}{2500} $. Chứng minh $ D&gt;48 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex67" data-kind="essay"><div class="eh"><span class="el">Câu 67</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ E=\dfrac{2}{3}+\dfrac{8}{9}+\dfrac{26}{27}+\cdots+\dfrac{3^n-1}{3^n} $. Chứng minh $ E&gt;n-\dfrac{1}{2} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex68" data-kind="essay"><div class="eh"><span class="el">Câu 68</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ F=\dfrac{4}{3}+\dfrac{10}{9}+\dfrac{28}{27}+\cdots+\dfrac{3^{98}+1}{3^98} $. Chứng minh $ F&lt;100 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex69" data-kind="essay"><div class="eh"><span class="el">Câu 69</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ G=\dfrac{5}{4}+\dfrac{5}{4^2}+\dfrac{5}{4^3}+\cdots+\dfrac{5}{4^{99}} $. Chứng minh $ G&lt;\dfrac{5}{3} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex70" data-kind="essay"><div class="eh"><span class="el">Câu 70</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ H=\dfrac{3}{1^2\cdot 2^2}+ \dfrac{5}{2^2\cdot 3^2}+\dfrac{7}{3^2\cdot 4^2}+\cdots+\dfrac{19}{9^2\cdot 10^2} $. Chứng minh $ H&lt;1 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex71" data-kind="essay"><div class="eh"><span class="el">Câu 71</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $I=\dfrac{1}{3}+\dfrac{2}{3^2}+\dfrac{3}{3^3}+\cdots+\dfrac{100}{3^{100}} $. Chứng minh $ E&lt;\dfrac{3}{4} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex72" data-kind="essay"><div class="eh"><span class="el">Câu 72</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $K=\dfrac{4}{3}+\dfrac{7}{3^2}+\dfrac{10}{3^3}+\cdots+\dfrac{3n+1}{3^{n}} $ với $ n\in \mathbb {N^*} $. Chứng minh $ K&lt;\dfrac{11}{4} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex73" data-kind="essay"><div class="eh"><span class="el">Câu 73</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ L=\dfrac{5}{3}+\dfrac{8}{3^2}+\dfrac{11}{3^3}+\cdots+\dfrac{302}{3^{100}} $. Chứng minh $ 2\dfrac{5}{9}&lt;L&lt;3\dfrac{1}{2} $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex74" data-kind="essay"><div class="eh"><span class="el">Câu 74</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ M=\dfrac{7}{3}+\dfrac{13}{3^2}+\dfrac{19}{3^3}+\cdots+\dfrac{601}{3^{100}} $. Chứng minh $ 3\dfrac{7}{9}&lt;M&lt;5 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex75" data-kind="essay"><div class="eh"><span class="el">Câu 75</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $ N=\dfrac{11}{3}+\dfrac{17}{3^2}+\dfrac{23}{3^3}+\cdots+\dfrac{605}{3^{100}} $. Chứng minh $ N&lt;7 $.</div></div><div class="qtools"></div></div></div><div class="lz"><div class="q ex" id="ex76" data-kind="essay"><div class="eh"><span class="el">Câu 76</span><span class="tag">Tự luận</span></div><div class="qtext"><div class="tp">Cho $P=\dfrac{4}{3}+\dfrac{13}{3^2}+\dfrac{22}{3^3}+\cdots+\dfrac{904}{3^{100}} $. Chứng minh $ P&lt;\dfrac{17}{4} $.</div></div><div class="qtools"></div></div></div>
     </main>
     <div class="foot">Liên hệ Nguyễn Thành Chương - 0914685866</div>
     <div class="fab">
